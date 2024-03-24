@@ -11,6 +11,12 @@ option(VKCHIP8_ENABLE_CPPCHECK "Enable cppcheck in build" OFF)
 option(VKCHIP8_ENABLE_IWYU "Enable include-what-you-use in build" OFF)
 
 find_package(fmt REQUIRED)
+find_package(imgui REQUIRED)
+find_package(glm REQUIRED)
+find_package(SDL2)
+find_package(spdlog REQUIRED)
+find_package(VulkanHeaders REQUIRED)
+find_package(VulkanLoader REQUIRED)
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(CTest)

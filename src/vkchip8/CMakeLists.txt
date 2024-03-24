@@ -8,6 +8,12 @@ target_sources(vkchip8
 target_link_libraries(vkchip8
     PRIVATE
         fmt::fmt
+        glm::glm
+        imgui::imgui
+        vulkan-headers::vulkan-headers
+        Vulkan::Loader
+        SDL2::SDL2main
+        spdlog::spdlog
         project-options
 )
 
