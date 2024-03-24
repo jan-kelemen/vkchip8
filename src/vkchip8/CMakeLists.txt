@@ -2,6 +2,10 @@ add_executable(vkchip8)
 
 target_sources(vkchip8
     PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vkchip8.m.cpp
 )
 
@@ -36,3 +40,21 @@ if (VKCHIP8_BUILD_TESTS)
         catch_discover_tests(vkchip8_test)
     endif()
 endif()
+
+source_group("Header Files"
+    FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.hpp
+)
+
+source_group("Source Files"
+    FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vkchip8.m.cpp
+)
+
+set_property(TARGET vkchip8 
+    PROPERTY 
+        VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
