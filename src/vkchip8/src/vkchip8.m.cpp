@@ -20,6 +20,7 @@
 // Read comments in imgui_impl_vulkan.h.
 
 #include <vulkan_context.hpp>
+#include <vulkan_device.hpp>
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.hpp"
@@ -93,123 +94,11 @@ void transition_image(VkImage const image,
     vkCmdPipelineBarrier2(command_buffer, &dependency);
 }
 
-static VkPhysicalDevice SetupVulkan_SelectPhysicalDevice()
-{
-    uint32_t gpu_count;
-    VkResult err = vkEnumeratePhysicalDevices(g_Instance, &gpu_count, nullptr);
-    check_vk_result(err);
-    IM_ASSERT(gpu_count > 0);
-
-    ImVector<VkPhysicalDevice> gpus;
-    gpus.resize(gpu_count);
-    err = vkEnumeratePhysicalDevices(g_Instance, &gpu_count, gpus.Data);
-    check_vk_result(err);
-
-    // If a number >1 of GPUs got reported, find discrete GPU if present, or use
-    // first one available. This covers most common cases
-    // (multi-gpu/integrated+dedicated graphics). Handling more complicated
-    // setups (multiple dedicated GPUs) is out of scope of this sample.
-    for (VkPhysicalDevice& device : gpus)
-    {
-        VkPhysicalDeviceProperties properties;
-        vkGetPhysicalDeviceProperties(device, &properties);
-        if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-            return device;
-    }
-
-    // Use first GPU (Integrated) is a Discrete one is not available.
-    if (gpu_count > 0)
-        return gpus[0];
-    return VK_NULL_HANDLE;
-}
-
 static void SetupVulkan()
 {
     VkResult err;
 
-    // Select Physical Device (GPU)
-    g_PhysicalDevice = SetupVulkan_SelectPhysicalDevice();
-
-    // Select graphics queue family
     {
-        uint32_t count;
-        vkGetPhysicalDeviceQueueFamilyProperties(g_PhysicalDevice,
-            &count,
-            nullptr);
-        VkQueueFamilyProperties* queues = (VkQueueFamilyProperties*) malloc(
-            sizeof(VkQueueFamilyProperties) * count);
-        vkGetPhysicalDeviceQueueFamilyProperties(g_PhysicalDevice,
-            &count,
-            queues);
-        for (uint32_t i = 0; i < count; i++)
-            if (queues[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-            {
-                g_QueueFamily = i;
-                break;
-            }
-        free(queues);
-        IM_ASSERT(g_QueueFamily != (uint32_t) -1);
-    }
-
-    // Create Logical Device (with 1 queue)
-    {
-        ImVector<char const*> device_extensions;
-        device_extensions.push_back("VK_KHR_swapchain");
-        device_extensions.push_back("VK_KHR_dynamic_rendering");
-        device_extensions.push_back("VK_KHR_depth_stencil_resolve");
-        device_extensions.push_back("VK_KHR_create_renderpass2");
-        device_extensions.push_back("VK_KHR_multiview");
-        device_extensions.push_back("VK_KHR_maintenance2");
-
-        // Enumerate physical device extension
-        uint32_t properties_count;
-        ImVector<VkExtensionProperties> properties;
-        vkEnumerateDeviceExtensionProperties(g_PhysicalDevice,
-            nullptr,
-            &properties_count,
-            nullptr);
-        properties.resize(properties_count);
-        vkEnumerateDeviceExtensionProperties(g_PhysicalDevice,
-            nullptr,
-            &properties_count,
-            properties.Data);
-#ifdef VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME
-        if (IsExtensionAvailable(properties,
-                VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME))
-            device_extensions.push_back(
-                VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
-#endif
-
-        float const queue_priority[] = {1.0f};
-        VkDeviceQueueCreateInfo queue_info[1] = {};
-        queue_info[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queue_info[0].queueFamilyIndex = g_QueueFamily;
-        queue_info[0].queueCount = 1;
-        queue_info[0].pQueuePriorities = queue_priority;
-
-        VkPhysicalDeviceFeatures device_features{.sampleRateShading = VK_TRUE,
-            .samplerAnisotropy = VK_TRUE};
-
-        VkPhysicalDeviceVulkan13Features device_13_features{
-            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
-            .synchronization2 = VK_TRUE,
-            .dynamicRendering = VK_TRUE};
-
-        VkDeviceCreateInfo create_info = {};
-        create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        create_info.queueCreateInfoCount =
-            sizeof(queue_info) / sizeof(queue_info[0]);
-        create_info.pQueueCreateInfos = queue_info;
-        create_info.enabledExtensionCount = (uint32_t) device_extensions.Size;
-        create_info.ppEnabledExtensionNames = device_extensions.Data;
-        create_info.pEnabledFeatures = &device_features;
-        create_info.pNext = &device_13_features;
-
-        err = vkCreateDevice(g_PhysicalDevice,
-            &create_info,
-            g_Allocator,
-            &g_Device);
-        check_vk_result(err);
         vkGetDeviceQueue(g_Device, g_QueueFamily, 0, &g_Queue);
     }
 
@@ -299,8 +188,6 @@ static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd,
 static void CleanupVulkan()
 {
     vkDestroyDescriptorPool(g_Device, g_DescriptorPool, g_Allocator);
-
-    vkDestroyDevice(g_Device, g_Allocator);
 }
 
 static void CleanupVulkanWindow()
@@ -470,6 +357,10 @@ int main(int, char**)
     g_Instance = context.instance();
     VkSurfaceKHR surface{context.surface()};
 
+    auto device{vkchip8::create_device(context)};
+    g_PhysicalDevice = device.physical();
+    g_Device = device.logical();
+    g_QueueFamily = device.graphics_family();
     SetupVulkan();
 
     // Create Window Surface
