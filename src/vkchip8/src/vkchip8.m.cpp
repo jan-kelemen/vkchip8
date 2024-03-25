@@ -19,6 +19,8 @@
 //   by your own engine/app code.
 // Read comments in imgui_impl_vulkan.h.
 
+#include <vulkan_context.hpp>
+
 #include "imgui.h"
 #include "imgui_impl_sdl2.hpp"
 #include "imgui_impl_vulkan.hpp"
@@ -27,12 +29,19 @@
 #include <stdio.h> // printf, fprintf
 #include <stdlib.h> // abort
 #include <vulkan/vulkan.h>
+
 // #include <vulkan/vulkan_beta.h>
 
 // #define APP_USE_UNLIMITED_FRAME_RATE
-#ifdef _DEBUG
-#define APP_USE_VULKAN_DEBUG_REPORT
+
+namespace
+{
+#ifdef NDEBUG
+    constexpr bool enable_validation_layers{false};
+#else
+    constexpr bool enable_validation_layers{true};
 #endif
+} // namespace
 
 // Data
 static VkAllocationCallbacks* g_Allocator = nullptr;
@@ -84,40 +93,6 @@ void transition_image(VkImage const image,
     vkCmdPipelineBarrier2(command_buffer, &dependency);
 }
 
-#ifdef APP_USE_VULKAN_DEBUG_REPORT
-static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT flags,
-    VkDebugReportObjectTypeEXT objectType,
-    uint64_t object,
-    size_t location,
-    int32_t messageCode,
-    char const* pLayerPrefix,
-    char const* pMessage,
-    void* pUserData)
-{
-    (void) flags;
-    (void) object;
-    (void) location;
-    (void) messageCode;
-    (void) pUserData;
-    (void) pLayerPrefix; // Unused arguments
-    fprintf(stderr,
-        "[vulkan] Debug report from ObjectType: %i\nMessage: %s\n\n",
-        objectType,
-        pMessage);
-    return VK_FALSE;
-}
-#endif // APP_USE_VULKAN_DEBUG_REPORT
-
-static bool IsExtensionAvailable(
-    ImVector<VkExtensionProperties> const& properties,
-    char const* extension)
-{
-    for (VkExtensionProperties const& p : properties)
-        if (strcmp(p.extensionName, extension) == 0)
-            return true;
-    return false;
-}
-
 static VkPhysicalDevice SetupVulkan_SelectPhysicalDevice()
 {
     uint32_t gpu_count;
@@ -148,86 +123,9 @@ static VkPhysicalDevice SetupVulkan_SelectPhysicalDevice()
     return VK_NULL_HANDLE;
 }
 
-static void SetupVulkan(ImVector<char const*> instance_extensions)
+static void SetupVulkan()
 {
     VkResult err;
-
-    // Create Vulkan Instance
-    {
-        VkApplicationInfo app_info{};
-        app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        app_info.pApplicationName = "vkpong";
-        app_info.applicationVersion = VK_MAKE_API_VERSION(0, 0, 1, 0);
-        app_info.apiVersion = VK_API_VERSION_1_3;
-
-        VkInstanceCreateInfo create_info = {};
-        create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        create_info.pApplicationInfo = &app_info;
-
-        // Enumerate available extensions
-        uint32_t properties_count;
-        ImVector<VkExtensionProperties> properties;
-        vkEnumerateInstanceExtensionProperties(nullptr,
-            &properties_count,
-            nullptr);
-        properties.resize(properties_count);
-        err = vkEnumerateInstanceExtensionProperties(nullptr,
-            &properties_count,
-            properties.Data);
-        check_vk_result(err);
-
-        // Enable required extensions
-        if (IsExtensionAvailable(properties,
-                VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
-            instance_extensions.push_back(
-                VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-#ifdef VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME
-        if (IsExtensionAvailable(properties,
-                VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME))
-        {
-            instance_extensions.push_back(
-                VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-            create_info.flags |=
-                VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-        }
-#endif
-
-        // Enabling validation layers
-#ifdef APP_USE_VULKAN_DEBUG_REPORT
-        char const* layers[] = {"VK_LAYER_KHRONOS_validation"};
-        create_info.enabledLayerCount = 1;
-        create_info.ppEnabledLayerNames = layers;
-        instance_extensions.push_back("VK_EXT_debug_report");
-#endif
-
-        // Create Vulkan Instance
-        create_info.enabledExtensionCount = (uint32_t) instance_extensions.Size;
-        create_info.ppEnabledExtensionNames = instance_extensions.Data;
-        err = vkCreateInstance(&create_info, g_Allocator, &g_Instance);
-        check_vk_result(err);
-
-        // Setup the debug report callback
-#ifdef APP_USE_VULKAN_DEBUG_REPORT
-        auto vkCreateDebugReportCallbackEXT =
-            (PFN_vkCreateDebugReportCallbackEXT) vkGetInstanceProcAddr(
-                g_Instance,
-                "vkCreateDebugReportCallbackEXT");
-        IM_ASSERT(vkCreateDebugReportCallbackEXT != nullptr);
-        VkDebugReportCallbackCreateInfoEXT debug_report_ci = {};
-        debug_report_ci.sType =
-            VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-        debug_report_ci.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT |
-            VK_DEBUG_REPORT_WARNING_BIT_EXT |
-            VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-        debug_report_ci.pfnCallback = debug_report;
-        debug_report_ci.pUserData = nullptr;
-        err = vkCreateDebugReportCallbackEXT(g_Instance,
-            &debug_report_ci,
-            g_Allocator,
-            &g_DebugReport);
-        check_vk_result(err);
-#endif
-    }
 
     // Select Physical Device (GPU)
     g_PhysicalDevice = SetupVulkan_SelectPhysicalDevice();
@@ -402,16 +300,7 @@ static void CleanupVulkan()
 {
     vkDestroyDescriptorPool(g_Device, g_DescriptorPool, g_Allocator);
 
-#ifdef APP_USE_VULKAN_DEBUG_REPORT
-    // Remove the debug report callback
-    auto vkDestroyDebugReportCallbackEXT =
-        (PFN_vkDestroyDebugReportCallbackEXT) vkGetInstanceProcAddr(g_Instance,
-            "vkDestroyDebugReportCallbackEXT");
-    vkDestroyDebugReportCallbackEXT(g_Instance, g_DebugReport, g_Allocator);
-#endif // APP_USE_VULKAN_DEBUG_REPORT
-
     vkDestroyDevice(g_Device, g_Allocator);
-    vkDestroyInstance(g_Instance, g_Allocator);
 }
 
 static void CleanupVulkanWindow()
@@ -577,17 +466,14 @@ int main(int, char**)
         return -1;
     }
 
-    ImVector<char const*> extensions;
-    uint32_t extensions_count = 0;
-    SDL_Vulkan_GetInstanceExtensions(window, &extensions_count, nullptr);
-    extensions.resize(extensions_count);
-    SDL_Vulkan_GetInstanceExtensions(window,
-        &extensions_count,
-        extensions.Data);
-    SetupVulkan(extensions);
+    auto context{vkchip8::create_context(window, enable_validation_layers)};
+    g_Instance = context.instance();
+    VkSurfaceKHR surface{context.surface()};
+
+    SetupVulkan();
 
     // Create Window Surface
-    VkSurfaceKHR surface;
+
     VkResult err;
     if (SDL_Vulkan_CreateSurface(window, g_Instance, &surface) == 0)
     {

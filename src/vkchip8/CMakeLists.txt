@@ -6,7 +6,16 @@ target_sources(vkchip8
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vkchip8.m.cpp
+)
+
+target_include_directories(vkchip8
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(vkchip8
@@ -45,12 +54,16 @@ source_group("Header Files"
     FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.hpp
 )
 
 source_group("Source Files"
     FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vkchip8.m.cpp
 )
 
