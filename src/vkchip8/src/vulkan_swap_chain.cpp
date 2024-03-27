@@ -181,7 +181,7 @@ vkchip8::vulkan_swap_chain::vulkan_swap_chain(
     , device_{std::exchange(other.device_, nullptr)}
     , image_format_{other.image_format_}
     , extent_{other.extent_}
-    , chain{std::exchange(other.chain, nullptr)}
+    , chain_{std::exchange(other.chain_, nullptr)}
     , images_{std::move(other.images_)}
     , image_views_{std::move(other.image_views_)}
     , image_syncs_{std::move(other.image_syncs_)}
@@ -214,7 +214,7 @@ bool vkchip8::vulkan_swap_chain::acquire_next_image(
         UINT64_MAX);
 
     VkResult const result{vkAcquireNextImageKHR(device_->logical(),
-        chain,
+        chain_,
         timeout,
         sync.image_available,
         VK_NULL_HANDLE,
@@ -261,7 +261,7 @@ bool vkchip8::vulkan_swap_chain::submit_command_buffer(
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
-    std::array swapchains{chain};
+    std::array swapchains{chain_};
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.waitSemaphoreCount = 1;
@@ -314,7 +314,7 @@ vkchip8::vulkan_swap_chain& vkchip8::vulkan_swap_chain::operator=(
         swap(device_, other.device_);
         swap(image_format_, other.image_format_);
         swap(extent_, other.extent_);
-        swap(chain, other.chain);
+        swap(chain_, other.chain_);
         swap(images_, other.images_);
         swap(image_views_, other.image_views_);
         swap(image_syncs_, other.image_syncs_);
@@ -337,8 +337,9 @@ void vkchip8::vulkan_swap_chain::create_chain_and_images()
 
     image_format_ = surface_format.format;
     extent_ = choose_swap_extent(window_, swap_details.capabilities);
+    min_image_count_ = swap_details.capabilities.minImageCount;
 
-    uint32_t image_count{swap_details.capabilities.minImageCount + 1};
+    uint32_t image_count{min_image_count_ + 1};
     if (swap_details.capabilities.maxImageCount > 0)
     {
         image_count =
@@ -378,13 +379,13 @@ void vkchip8::vulkan_swap_chain::create_chain_and_images()
     if (vkCreateSwapchainKHR(device_->logical(),
             &create_info,
             nullptr,
-            &chain) != VK_SUCCESS)
+            &chain_) != VK_SUCCESS)
     {
         throw std::runtime_error{"failed to create swap chain!"};
     }
 
     if (vkGetSwapchainImagesKHR(device_->logical(),
-            chain,
+            chain_,
             &image_count,
             nullptr) != VK_SUCCESS)
     {
@@ -393,7 +394,7 @@ void vkchip8::vulkan_swap_chain::create_chain_and_images()
 
     images_.resize(image_count);
     if (vkGetSwapchainImagesKHR(device_->logical(),
-            chain,
+            chain_,
             &image_count,
             images_.data()) != VK_SUCCESS)
     {
@@ -418,7 +419,7 @@ void vkchip8::vulkan_swap_chain::cleanup()
         vkDestroyImageView(device_->logical(), image_views_[i], nullptr);
     }
 
-    vkDestroySwapchainKHR(device_->logical(), chain, nullptr);
+    vkDestroySwapchainKHR(device_->logical(), chain_, nullptr);
 }
 
 vkchip8::vulkan_swap_chain::image_sync::image_sync(

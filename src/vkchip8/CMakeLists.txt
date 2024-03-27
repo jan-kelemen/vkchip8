@@ -10,6 +10,8 @@ target_sources(vkchip8
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_device.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_device.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_renderer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_renderer.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_swap_chain.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_swap_chain.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.cpp
@@ -60,6 +62,7 @@ source_group("Header Files"
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_device.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_renderer.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_swap_chain.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.hpp
 )
@@ -70,6 +73,7 @@ source_group("Source Files"
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_device.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_renderer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_swap_chain.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vkchip8.m.cpp

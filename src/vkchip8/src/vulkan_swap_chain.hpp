@@ -3,6 +3,8 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include <vulkan_utility.hpp>
+
 #include <cstdint>
 #include <vector>
 
@@ -46,7 +48,15 @@ namespace vkchip8
     public: // Interface
         [[nodiscard]] constexpr VkExtent2D extent() const noexcept;
 
+        [[nodiscard]] constexpr VkSwapchainKHR swap_chain() const noexcept;
+
+        [[nodiscard]] constexpr VkQueue graphics_queue() const noexcept;
+
         [[nodiscard]] constexpr VkFormat image_format() const noexcept;
+
+        [[nodiscard]] constexpr uint32_t min_image_count() const noexcept;
+
+        [[nodiscard]] constexpr uint32_t image_count() const noexcept;
 
         [[nodiscard]] constexpr VkImage image(
             uint32_t image_index) const noexcept;
@@ -103,11 +113,12 @@ namespace vkchip8
         vulkan_context* context_{};
         vulkan_device* device_{};
         VkFormat image_format_{};
+        uint32_t min_image_count_{};
         VkExtent2D extent_{};
-        VkSwapchainKHR chain{};
+        VkSwapchainKHR chain_{};
         std::vector<VkImage> images_;
         std::vector<VkImageView> image_views_;
-        std::vector<image_sync> image_syncs_{};
+        std::vector<image_sync> image_syncs_;
 
         bool framebuffer_resized_{};
 
@@ -122,10 +133,34 @@ inline constexpr VkExtent2D vkchip8::vulkan_swap_chain::extent() const noexcept
     return extent_;
 }
 
+inline constexpr VkSwapchainKHR
+vkchip8::vulkan_swap_chain::swap_chain() const noexcept
+{
+    return chain_;
+}
+
+inline constexpr VkQueue
+vkchip8::vulkan_swap_chain::graphics_queue() const noexcept
+{
+    return graphics_queue_;
+}
+
 inline constexpr VkFormat
 vkchip8::vulkan_swap_chain::image_format() const noexcept
 {
     return image_format_;
+}
+
+inline constexpr uint32_t
+vkchip8::vulkan_swap_chain::min_image_count() const noexcept
+{
+    return min_image_count_;
+}
+
+inline constexpr uint32_t
+vkchip8::vulkan_swap_chain::image_count() const noexcept
+{
+    return vkchip8::count_cast(images_.size());
 }
 
 inline constexpr VkImage vkchip8::vulkan_swap_chain::image(
