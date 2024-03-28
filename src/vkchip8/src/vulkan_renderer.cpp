@@ -190,6 +190,7 @@ void vkchip8::vulkan_renderer::init_imgui()
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |=
         ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
     ImGui::GetStyle().Colors[ImGuiCol_WindowBg] =

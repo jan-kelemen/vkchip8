@@ -81,6 +81,7 @@ int main(int, char**)
             ImGui_ImplSDL2_NewFrame();
             ImGui::NewFrame();
             ImGui::ShowDemoWindow();
+            ImGui::ShowMetricsWindow();
 
             renderer.draw();
         }
