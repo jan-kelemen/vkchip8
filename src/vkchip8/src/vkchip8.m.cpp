@@ -5,18 +5,23 @@
 #include <vulkan_swap_chain.hpp>
 
 #include <chip8.hpp>
+#include <pc_speaker.hpp>
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.hpp"
 #include "imgui_impl_vulkan.hpp"
 #include <SDL.h>
+
 #include <SDL_vulkan.h>
 #include <stdio.h> // printf, fprintf
 #include <stdlib.h> // abort
 #include <vulkan/vulkan.h>
 
+#include <spdlog/spdlog.h>
+
 #include <filesystem>
 #include <fstream>
+#include <map>
 #include <vector>
 
 namespace
@@ -48,14 +53,32 @@ namespace
 #else
     constexpr bool enable_validation_layers{true};
 #endif
+
+    std::map<SDL_Keycode, vkchip8::key_code> key_map{
+        {SDLK_1, vkchip8::key_code::k1},
+        {SDLK_2, vkchip8::key_code::k2},
+        {SDLK_3, vkchip8::key_code::k3},
+        {SDLK_4, vkchip8::key_code::k4},
+        {SDLK_q, vkchip8::key_code::k4},
+        {SDLK_w, vkchip8::key_code::k5},
+        {SDLK_e, vkchip8::key_code::k6},
+        {SDLK_r, vkchip8::key_code::kC},
+        {SDLK_a, vkchip8::key_code::k7},
+        {SDLK_s, vkchip8::key_code::k8},
+        {SDLK_d, vkchip8::key_code::k9},
+        {SDLK_f, vkchip8::key_code::kE},
+        {SDLK_z, vkchip8::key_code::kA},
+        {SDLK_x, vkchip8::key_code::k0},
+        {SDLK_c, vkchip8::key_code::kB},
+        {SDLK_v, vkchip8::key_code::kF},
+    };
 } // namespace
 
 // Main code
 int main([[maybe_unused]] int argc, char** argv)
 {
     // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) !=
-        0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
         return -1;
@@ -81,8 +104,12 @@ int main([[maybe_unused]] int argc, char** argv)
         return -1;
     }
 
+    vkchip8::pc_speaker speaker;
+
     auto code{read_file(argv[1])};
-    vkchip8::chip8 emulator;
+    vkchip8::chip8 emulator{vkchip8::chip8::memory_size,
+        [&speaker]() { speaker.beep(); }};
+
     emulator.load(
         std::span{reinterpret_cast<std::byte*>(code.data()), code.size()});
 
@@ -110,11 +137,32 @@ int main([[maybe_unused]] int argc, char** argv)
             {
                 ImGui_ImplSDL2_ProcessEvent(&event);
                 if (event.type == SDL_QUIT)
+                {
                     done = true;
+                }
                 if (event.type == SDL_WINDOWEVENT &&
                     event.window.event == SDL_WINDOWEVENT_CLOSE &&
                     event.window.windowID == SDL_GetWindowID(window))
+                {
                     done = true;
+                }
+
+                if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
+                {
+                    if (auto it{key_map.find(event.key.keysym.sym)};
+                        it != key_map.cend())
+                    {
+                        emulator.key_event(event.type == SDL_KEYDOWN
+                                ? vkchip8::key_event_type::pressed
+                                : vkchip8::key_event_type::released,
+                            it->second);
+                    }
+                    else
+                    {
+                        spdlog::error("Unrecogrnized key code: {}",
+                            event.key.keysym.sym);
+                    }
+                }
             }
 
             ImGui_ImplVulkan_NewFrame();
@@ -123,24 +171,23 @@ int main([[maybe_unused]] int argc, char** argv)
             // ImGui::ShowDemoWindow();
             ImGui::ShowMetricsWindow();
 
-            ImGui::Begin("Screen");
-            for (auto const& screen_row : emulator.screen_data())
+            ImGui::Begin("Registers");
+            for (size_t i{}; i != emulator.data_registers_.size(); ++i)
             {
-                std::string pixels;
-                for (size_t i{}; i != screen_row.size(); ++i)
-                {
-                    pixels += screen_row.test(i) ? 'X' : ' ';
-                }
-                ImGui::Text(pixels.c_str());
+                auto const label{"V" + std::to_string(i)};
+                ImGui::LabelText(label.c_str(),
+                    "%x",
+                    emulator.data_registers_[i]);
             }
+            ImGui::LabelText("delay", "%x", emulator.delay_timer_);
             ImGui::End();
 
             emulator.tick();
+            speaker.tick();
 
             renderer.draw(screen_renderer);
-
-            vkDeviceWaitIdle(device.logical());
         }
+        vkDeviceWaitIdle(device.logical());
     }
 
     SDL_DestroyWindow(window);

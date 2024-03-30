@@ -33,12 +33,17 @@ namespace
     std::mt19937 random_engine{std::random_device{}()};
 } // namespace
 
-vkchip8::chip8::chip8(size_t ram_size) : memory_{ram_size, std::byte{}} { }
+vkchip8::chip8::chip8(size_t ram_size, std::function<void(void)> beep_callback)
+    : memory_{ram_size, std::byte{}}
+    , beep_callback_{beep_callback}
+{
+}
 
 void vkchip8::chip8::tick()
 {
     uint16_t const operation{fetch()};
     execute(operation);
+    tick_timers();
 }
 
 void vkchip8::chip8::key_event(key_event_type type, key_code code)
@@ -279,7 +284,7 @@ void vkchip8::chip8::execute(uint16_t operation)
     }
     else if (digit1 == 0xF && digit3 == 0x0 && digit4 == 0x7)
     {
-        delay_timer_ = data_registers_[digit2];
+        data_registers_[digit2] = delay_timer_;
     }
     else if (digit1 == 0xF && digit3 == 0x0 && digit4 == 0xA)
     {
@@ -303,7 +308,7 @@ void vkchip8::chip8::execute(uint16_t operation)
     {
         delay_timer_ = data_registers_[digit2];
     }
-    else if (digit1 == 0xF && digit3 == 0x1 && digit4 == 0x6)
+    else if (digit1 == 0xF && digit3 == 0x1 && digit4 == 0x8)
     {
         sound_timer_ = data_registers_[digit2];
     }
@@ -341,6 +346,23 @@ void vkchip8::chip8::execute(uint16_t operation)
     else
     {
         assert(false);
+    }
+}
+
+void vkchip8::chip8::tick_timers()
+{
+    if (delay_timer_ > 0)
+    {
+        --delay_timer_;
+    }
+
+    if (sound_timer_ > 0)
+    {
+        if (sound_timer_ == 1)
+        {
+            beep_callback_();
+            --sound_timer_;
+        }
     }
 }
 

@@ -4,6 +4,7 @@
 #include <array>
 #include <bitset>
 #include <cstddef>
+#include <functional>
 #include <span>
 #include <vector>
 
@@ -47,7 +48,9 @@ namespace vkchip8
     public: // Construction
         chip8() : chip8{memory_size} { }
 
-        explicit chip8(size_t ram_size);
+        explicit chip8(
+            size_t ram_size,
+            std::function<void(void)> beep_callback = []() {});
 
         chip8(chip8 const&) = default;
         chip8(chip8&&) noexcept = default;
@@ -79,11 +82,14 @@ namespace vkchip8
 
         [[nodiscard]] uint16_t fetch();
         void execute(uint16_t operation);
+        void tick_timers();
 
         void push_stack(uint16_t value);
         [[nodiscard]] uint16_t pop_stack();
 
-    private: // Data
+    public: // Data
+        std::function<void(void)> beep_callback_;
+
         std::vector<std::byte> memory_;
         uint16_t program_counter_{start_address};
         std::array<uint8_t, 16> data_registers_{};

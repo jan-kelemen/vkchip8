@@ -3,13 +3,6 @@
 
 #include <vulkan/vulkan_core.h>
 
-// layout(location = 0) in vec2 inPosition;
-// layout(location = 1) in vec2 inOffset;
-//
-// layout(binding = 0) uniform UniformBufferObject { vec2 pixelScale; }
-//
-// ubo;
-
 #include <glm/glm.hpp>
 
 #include <memory>
