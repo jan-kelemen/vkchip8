@@ -138,6 +138,8 @@ int main([[maybe_unused]] int argc, char** argv)
             emulator.tick();
 
             renderer.draw(screen_renderer);
+
+            vkDeviceWaitIdle(device.logical());
         }
     }
 

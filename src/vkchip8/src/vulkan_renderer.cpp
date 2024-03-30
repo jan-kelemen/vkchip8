@@ -146,8 +146,6 @@ vkchip8::vulkan_renderer::vulkan_renderer(SDL_Window* window,
 
 vkchip8::vulkan_renderer::~vulkan_renderer()
 {
-    vkDeviceWaitIdle(device_->logical());
-
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
