@@ -3,6 +3,8 @@
 #include <vulkan_renderer.hpp>
 #include <vulkan_swap_chain.hpp>
 
+#include <chip8.hpp>
+
 #include "imgui.h"
 #include "imgui_impl_sdl2.hpp"
 #include "imgui_impl_vulkan.hpp"
@@ -11,6 +13,32 @@
 #include <stdio.h> // printf, fprintf
 #include <stdlib.h> // abort
 #include <vulkan/vulkan.h>
+
+#include <filesystem>
+#include <fstream>
+#include <vector>
+
+namespace
+{
+    [[nodiscard]] std::vector<char> read_file(std::filesystem::path const& file)
+    {
+        std::ifstream stream{file, std::ios::ate | std::ios::binary};
+
+        if (!stream.is_open())
+        {
+            throw std::runtime_error{"failed to open file!"};
+        }
+
+        auto const eof{stream.tellg()};
+
+        std::vector<char> buffer(static_cast<size_t>(eof));
+        stream.seekg(0);
+
+        stream.read(buffer.data(), eof);
+
+        return buffer;
+    }
+} // namespace
 
 namespace
 {
@@ -22,7 +50,7 @@ namespace
 } // namespace
 
 // Main code
-int main(int, char**)
+int main([[maybe_unused]] int argc, char** argv)
 {
     // Setup SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) !=
@@ -51,6 +79,11 @@ int main(int, char**)
         printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
         return -1;
     }
+
+    auto code{read_file(argv[1])};
+    vkchip8::chip8 emulator;
+    emulator.load(
+        std::span{reinterpret_cast<std::byte*>(code.data()), code.size()});
 
     {
         auto context{vkchip8::create_context(window, enable_validation_layers)};
@@ -82,6 +115,20 @@ int main(int, char**)
             ImGui::NewFrame();
             ImGui::ShowDemoWindow();
             ImGui::ShowMetricsWindow();
+
+            ImGui::Begin("Screen");
+            for (auto const& screen_row : emulator.screen_data())
+            {
+                std::string pixels;
+                for (size_t i{}; i != screen_row.size(); ++i)
+                {
+                    pixels += screen_row.test(i) ? 'X' : ' ';
+                }
+                ImGui::Text(pixels.c_str());
+            }
+            ImGui::End();
+
+            emulator.tick();
 
             renderer.draw();
         }

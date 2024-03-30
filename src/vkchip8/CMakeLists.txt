@@ -33,6 +33,7 @@ target_link_libraries(vkchip8
         Vulkan::Loader
         SDL2::SDL2main
         spdlog::spdlog
+        chip8
         project-options
 )
 
