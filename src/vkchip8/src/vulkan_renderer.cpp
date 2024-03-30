@@ -1,5 +1,7 @@
 #include <vulkan_renderer.hpp>
 
+#include <screen.hpp>
+
 #include <vulkan_context.hpp>
 #include <vulkan_device.hpp>
 #include <vulkan_swap_chain.hpp>
@@ -63,7 +65,7 @@ namespace
 
         VkDescriptorPoolSize uniform_buffer_pool_size{};
         uniform_buffer_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uniform_buffer_pool_size.descriptorCount = count;
+        uniform_buffer_pool_size.descriptorCount = 3 * count;
 
         VkDescriptorPoolSize imgui_sampler_pool_size{};
         imgui_sampler_pool_size.type =
@@ -78,7 +80,7 @@ namespace
         pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         pool_info.poolSizeCount = vkchip8::count_cast(pool_sizes.size());
         pool_info.pPoolSizes = pool_sizes.data();
-        pool_info.maxSets = count + 1;
+        pool_info.maxSets = 3 * count + 1;
 
         VkDescriptorPool rv{};
         if (vkCreateDescriptorPool(device->logical(),
@@ -157,7 +159,7 @@ vkchip8::vulkan_renderer::~vulkan_renderer()
     cleanup_images();
 }
 
-void vkchip8::vulkan_renderer::draw()
+void vkchip8::vulkan_renderer::draw(screen const& object)
 {
     uint32_t image_index{};
     if (!swap_chain_->acquire_next_image(current_frame_, image_index))
@@ -170,7 +172,7 @@ void vkchip8::vulkan_renderer::draw()
 
     vkResetCommandBuffer(command_buffer, 0);
 
-    record_command_buffer(command_buffer, image_index);
+    record_command_buffer(object, command_buffer, image_index);
 
     if (!swap_chain_->submit_command_buffer(&command_buffer,
             current_frame_,
@@ -230,7 +232,7 @@ void vkchip8::vulkan_renderer::init_imgui()
     ImGui_ImplVulkan_Init(&init_info);
 }
 
-void vkchip8::vulkan_renderer::record_command_buffer(
+void vkchip8::vulkan_renderer::record_command_buffer(screen const& object,
     VkCommandBuffer& command_buffer,
     uint32_t const image_index)
 {
@@ -246,7 +248,7 @@ void vkchip8::vulkan_renderer::record_command_buffer(
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    constexpr VkClearValue clear_value{{{0.0f, 4.0f, 0.0f, 1.0f}}};
+    constexpr VkClearValue clear_value{{{0.0f, 0.0f, 0.0f, 1.0f}}};
     VkRenderingAttachmentInfoKHR color_attachment_info{};
     color_attachment_info.sType =
         VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
@@ -277,6 +279,8 @@ void vkchip8::vulkan_renderer::record_command_buffer(
     render_info.pColorAttachments = &color_attachment_info;
 
     vkCmdBeginRendering(command_buffer, &render_info);
+
+    object.render(command_buffer, swap_chain_->extent(), current_frame_);
 
     ImGui::Render();
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);

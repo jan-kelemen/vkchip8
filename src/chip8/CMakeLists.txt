@@ -48,4 +48,3 @@ source_group("Source Files"
     FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/chip8.cpp
 )
-

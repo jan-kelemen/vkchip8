@@ -11,6 +11,8 @@ struct SDL_Window;
 
 namespace vkchip8
 {
+    class screen;
+
     class vulkan_context;
     class vulkan_device;
     class vulkan_swap_chain;
@@ -34,7 +36,9 @@ namespace vkchip8
         ~vulkan_renderer();
 
     public: // Interface
-        void draw();
+        [[nodiscard]] constexpr VkDescriptorPool descriptor_pool() noexcept;
+
+        void draw(screen const& object);
 
     public: // Operators
         vulkan_renderer& operator=(vulkan_renderer const&) = delete;
@@ -44,7 +48,8 @@ namespace vkchip8
     private: // Helpers
         void init_imgui();
 
-        void record_command_buffer(VkCommandBuffer& command_buffer,
+        void record_command_buffer(screen const& object,
+            VkCommandBuffer& command_buffer,
             uint32_t image_index);
 
         [[nodiscard]] bool is_multisampled() const;
@@ -68,4 +73,10 @@ namespace vkchip8
     };
 } // namespace vkchip8
 
-#endif // !vkchip8_VULKAN_RENDERER_INCLUDED
+inline constexpr VkDescriptorPool
+vkchip8::vulkan_renderer::descriptor_pool() noexcept
+{
+    return descriptor_pool_;
+}
+
+#endif // !VKCHIP8_VULKAN_RENDERER_INCLUDED

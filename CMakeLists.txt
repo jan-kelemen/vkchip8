@@ -32,4 +32,6 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(${PROJECT_SOURCE_DIR}/cmake/project-options.cmake)
 endif()
 
+include(${PROJECT_SOURCE_DIR}/cmake/glslc.cmake)
+
 add_subdirectory(src)

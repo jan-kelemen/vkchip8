@@ -1,3 +1,4 @@
+#include <screen.hpp>
 #include <vulkan_context.hpp>
 #include <vulkan_device.hpp>
 #include <vulkan_renderer.hpp>
@@ -68,7 +69,7 @@ int main([[maybe_unused]] int argc, char** argv)
     // Create window with Vulkan graphics context
     SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_VULKAN |
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window* window = SDL_CreateWindow("Dear ImGui SDL2+Vulkan example",
+    SDL_Window* window = SDL_CreateWindow("vkchip8",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         1280,
@@ -94,6 +95,12 @@ int main([[maybe_unused]] int argc, char** argv)
             &device,
             &swap_chain};
 
+        vkchip8::screen screen_renderer{&emulator};
+        screen_renderer.attach_renderer(&device,
+            renderer.descriptor_pool(),
+            swap_chain.image_format(),
+            swap_chain.image_count());
+
         // Main loop
         bool done = false;
         while (!done)
@@ -113,7 +120,7 @@ int main([[maybe_unused]] int argc, char** argv)
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplSDL2_NewFrame();
             ImGui::NewFrame();
-            ImGui::ShowDemoWindow();
+            // ImGui::ShowDemoWindow();
             ImGui::ShowMetricsWindow();
 
             ImGui::Begin("Screen");
@@ -130,7 +137,7 @@ int main([[maybe_unused]] int argc, char** argv)
 
             emulator.tick();
 
-            renderer.draw();
+            renderer.draw(screen_renderer);
         }
     }
 
