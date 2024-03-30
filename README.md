@@ -17,3 +17,8 @@ conan install . --profile=conan/clang-18 --build=missing --settings build_type=R
 cmake --preset release
 cmake --build --preset=release
 ```
+
+## References
+* [matmikolay/chip-8](https://github.com/mattmikolay/chip-8)
+* [aquova/chip8-book](https://github.com/aquova/chip8-book)
+* [Timendus/chip8-test-suite](https://github.com/Timendus/chip8-test-suite)
