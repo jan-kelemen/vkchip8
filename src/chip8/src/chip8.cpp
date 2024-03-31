@@ -26,8 +26,6 @@ namespace
             uint16_t{digit3} << 4 | digit4;
     }
 
-    std::mt19937 random_engine{std::random_device{}()};
-
     // clang-format off
     constexpr std::array fontset{
         std::byte{0xF0}, std::byte{0x90}, std::byte{0x90}, std::byte{0x90}, std::byte{0xF0}, // 0
@@ -51,8 +49,11 @@ namespace
 
 } // namespace
 
-vkchip8::chip8::chip8(size_t ram_size, std::function<void(void)> beep_callback)
+vkchip8::chip8::chip8(size_t ram_size,
+    uint_fast32_t random_seed,
+    std::function<void(void)> beep_callback)
     : memory_{ram_size, std::byte{}}
+    , random_engine_{random_seed}
     , beep_callback_{beep_callback}
 {
 }
@@ -117,7 +118,7 @@ uint16_t vkchip8::chip8::fetch()
 
     program_counter_ += 2;
 
-    return rv;
+    return static_cast<uint16_t>(rv);
 }
 
 void vkchip8::chip8::execute(uint16_t operation)
@@ -225,7 +226,7 @@ void vkchip8::chip8::execute(uint16_t operation)
         auto const vx{data_registers_[digit2]};
         auto const vy{data_registers_[digit3]};
         auto const res{vx - vy};
-        data_registers_[digit2] = res;
+        data_registers_[digit2] = static_cast<uint8_t>(res);
         data_registers_[0xF] = vx >= vy;
     }
     else if (digit1 == 0x8 && digit4 == 0x6)
@@ -241,7 +242,7 @@ void vkchip8::chip8::execute(uint16_t operation)
         auto const vx{data_registers_[digit2]};
         auto const vy{data_registers_[digit3]};
         auto const res{vy - vx};
-        data_registers_[digit2] = res;
+        data_registers_[digit2] = static_cast<uint8_t>(res);
         data_registers_[0xF] = vy >= vx;
     }
     else if (digit1 == 0x8 && digit4 == 0xE)
@@ -273,8 +274,9 @@ void vkchip8::chip8::execute(uint16_t operation)
     else if (digit1 == 0xC)
     {
         // Set VX to a random number with a mask of NN
-        data_registers_[digit2] = std::uniform_int_distribution{0x00, 0xFF}(
-            random_engine) &from_hex_digits(0, 0, digit3, digit4);
+        data_registers_[digit2] =
+            static_cast<uint8_t>(std::uniform_int_distribution{0x00, 0xFF}(
+                random_engine_) &from_hex_digits(0, 0, digit3, digit4));
     }
     else if (digit1 == 0xD)
     {
@@ -328,7 +330,7 @@ void vkchip8::chip8::execute(uint16_t operation)
     else if (digit1 == 0xF && digit3 == 0x0 && digit4 == 0xA)
     {
         bool pressed{false};
-        for (size_t i{}; i != keys_.size(); ++i)
+        for (uint8_t i{}; i != keys_.size(); ++i)
         {
             if (keys_.test(i))
             {

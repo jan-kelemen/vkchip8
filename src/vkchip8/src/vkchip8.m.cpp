@@ -109,6 +109,7 @@ int main([[maybe_unused]] int argc, char** argv)
 
     auto code{read_file(argv[1])};
     vkchip8::chip8 emulator{vkchip8::chip8::memory_size,
+        std::random_device{}(),
         [&speaker]() { speaker.beep(); }};
 
     emulator.load(
@@ -189,19 +190,8 @@ int main([[maybe_unused]] int argc, char** argv)
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplSDL2_NewFrame();
             ImGui::NewFrame();
-            // ImGui::ShowDemoWindow();
-            ImGui::ShowMetricsWindow();
 
-            ImGui::Begin("Registers");
-            for (size_t i{}; i != emulator.data_registers_.size(); ++i)
-            {
-                auto const label{"V" + std::to_string(i)};
-                ImGui::LabelText(label.c_str(),
-                    "%x",
-                    emulator.data_registers_[i]);
-            }
-            ImGui::LabelText("delay", "%x", emulator.delay_timer_);
-            ImGui::End();
+            ImGui::ShowMetricsWindow();
 
             for (auto i{0}; i != 16; ++i)
             {

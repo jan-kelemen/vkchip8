@@ -5,6 +5,7 @@
 #include <bitset>
 #include <cstddef>
 #include <functional>
+#include <random>
 #include <span>
 #include <vector>
 
@@ -50,6 +51,7 @@ namespace vkchip8
 
         explicit chip8(
             size_t ram_size,
+            uint_fast32_t random_seed = {},
             std::function<void(void)> beep_callback = []() {});
 
         chip8(chip8 const&) = default;
@@ -88,9 +90,7 @@ namespace vkchip8
         void push_stack(uint16_t value);
         [[nodiscard]] uint16_t pop_stack();
 
-    public: // Data
-        std::function<void(void)> beep_callback_;
-
+    private: // Data
         std::vector<std::byte> memory_;
         uint16_t program_counter_{start_address};
         std::array<uint8_t, 16> data_registers_{};
@@ -101,6 +101,9 @@ namespace vkchip8
         std::array<uint16_t, stack_size> stack_{};
         size_t stack_pointer_{};
         std::bitset<16> keys_{};
+
+        std::minstd_rand random_engine_;
+        std::function<void(void)> beep_callback_;
     };
 } // namespace vkchip8
 
