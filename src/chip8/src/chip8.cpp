@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <random>
+#include <ranges>
 #include <utility>
 
 namespace
@@ -31,6 +32,28 @@ namespace
     }
 
     std::mt19937 random_engine{std::random_device{}()};
+
+    // clang-format off
+    constexpr std::array fontset{
+        std::byte{0xF0}, std::byte{0x90}, std::byte{0x90}, std::byte{0x90}, std::byte{0xF0}, // 0
+        std::byte{0x20}, std::byte{0x60}, std::byte{0x20}, std::byte{0x20}, std::byte{0x70}, // 1
+        std::byte{0xF0}, std::byte{0x10}, std::byte{0xF0}, std::byte{0x80}, std::byte{0xF0}, // 2
+        std::byte{0xF0}, std::byte{0x10}, std::byte{0xF0}, std::byte{0x10}, std::byte{0xF0}, // 3
+        std::byte{0x90}, std::byte{0x90}, std::byte{0xF0}, std::byte{0x10}, std::byte{0x10}, // 4
+        std::byte{0xF0}, std::byte{0x80}, std::byte{0xF0}, std::byte{0x10}, std::byte{0xF0}, // 5
+        std::byte{0xF0}, std::byte{0x80}, std::byte{0xF0}, std::byte{0x90}, std::byte{0xF0}, // 6
+        std::byte{0xF0}, std::byte{0x10}, std::byte{0x20}, std::byte{0x40}, std::byte{0x40}, // 7
+        std::byte{0xF0}, std::byte{0x90}, std::byte{0xF0}, std::byte{0x90}, std::byte{0xF0}, // 8
+        std::byte{0xF0}, std::byte{0x90}, std::byte{0xF0}, std::byte{0x10}, std::byte{0xF0}, // 9
+        std::byte{0xF0}, std::byte{0x90}, std::byte{0xF0}, std::byte{0x90}, std::byte{0x90}, // A
+        std::byte{0xE0}, std::byte{0x90}, std::byte{0xE0}, std::byte{0x90}, std::byte{0xE0}, // B
+        std::byte{0xF0}, std::byte{0x80}, std::byte{0x80}, std::byte{0x80}, std::byte{0xF0}, // C
+        std::byte{0xE0}, std::byte{0x90}, std::byte{0x90}, std::byte{0x90}, std::byte{0xE0}, // D
+        std::byte{0xF0}, std::byte{0x80}, std::byte{0xF0}, std::byte{0x80}, std::byte{0xF0}, // E
+        std::byte{0xF0}, std::byte{0x80}, std::byte{0xF0}, std::byte{0x80}, std::byte{0x80}  // F
+    };
+    // clang-format on
+
 } // namespace
 
 vkchip8::chip8::chip8(size_t ram_size, std::function<void(void)> beep_callback)
@@ -43,7 +66,23 @@ void vkchip8::chip8::tick()
 {
     uint16_t const operation{fetch()};
     execute(operation);
-    tick_timers();
+}
+
+void vkchip8::chip8::tick_timers()
+{
+    if (delay_timer_ > 0)
+    {
+        --delay_timer_;
+    }
+
+    if (sound_timer_ > 0)
+    {
+        if (sound_timer_ == 1)
+        {
+            beep_callback_();
+            --sound_timer_;
+        }
+    }
 }
 
 void vkchip8::chip8::key_event(key_event_type type, key_code code)
@@ -60,7 +99,9 @@ void vkchip8::chip8::load(std::span<std::byte> program, uint16_t address)
 
 void vkchip8::chip8::reset()
 {
-    std::ranges::fill(memory_, std::byte{});
+    std::ranges::copy(fontset, memory_.begin());
+    std::ranges::fill(memory_ | std::views::drop(fontset.size()), std::byte{});
+
     program_counter_ = start_address;
     std::ranges::fill(data_registers_, uint8_t{});
     i_register_ = 0;
@@ -346,23 +387,6 @@ void vkchip8::chip8::execute(uint16_t operation)
     else
     {
         assert(false);
-    }
-}
-
-void vkchip8::chip8::tick_timers()
-{
-    if (delay_timer_ > 0)
-    {
-        --delay_timer_;
-    }
-
-    if (sound_timer_ > 0)
-    {
-        if (sound_timer_ == 1)
-        {
-            beep_callback_();
-            --sound_timer_;
-        }
     }
 }
 

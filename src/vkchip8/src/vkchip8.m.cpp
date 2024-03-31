@@ -182,7 +182,12 @@ int main([[maybe_unused]] int argc, char** argv)
             ImGui::LabelText("delay", "%x", emulator.delay_timer_);
             ImGui::End();
 
-            emulator.tick();
+            for (auto i{0}; i != 16; ++i)
+            {
+                emulator.tick();
+            }
+
+            emulator.tick_timers();
             speaker.tick();
 
             renderer.draw(screen_renderer);

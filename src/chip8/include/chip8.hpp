@@ -61,6 +61,8 @@ namespace vkchip8
     public: // Interface
         void tick();
 
+        void tick_timers();
+
         void key_event(key_event_type type, key_code code);
 
         void load(std::span<std::byte> program,
@@ -82,7 +84,6 @@ namespace vkchip8
 
         [[nodiscard]] uint16_t fetch();
         void execute(uint16_t operation);
-        void tick_timers();
 
         void push_stack(uint16_t value);
         [[nodiscard]] uint16_t pop_stack();
