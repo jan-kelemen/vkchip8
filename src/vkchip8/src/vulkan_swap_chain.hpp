@@ -67,12 +67,12 @@ namespace vkchip8
         [[nodiscard]] bool acquire_next_image(uint32_t current_frame,
             uint32_t& image_index);
 
-        [[nodiscard]] bool submit_command_buffer(
+        [[nodiscard]] void submit_command_buffer(
             VkCommandBuffer const* command_buffer,
             uint32_t current_frame,
             uint32_t image_index);
 
-        void resized();
+        void recreate();
 
     public: // Operators
         vulkan_swap_chain& operator=(vulkan_swap_chain const&) = delete;
@@ -83,8 +83,6 @@ namespace vkchip8
         void create_chain_and_images();
 
         void cleanup();
-
-        void recreate();
 
     private:
         struct [[nodiscard]] image_sync final
@@ -119,8 +117,6 @@ namespace vkchip8
         std::vector<VkImage> images_;
         std::vector<VkImageView> image_views_;
         std::vector<image_sync> image_syncs_;
-
-        bool framebuffer_resized_{};
 
         VkQueue graphics_queue_{};
         VkQueue present_queue_{};
@@ -173,11 +169,6 @@ inline constexpr VkImageView vkchip8::vulkan_swap_chain::image_view(
     uint32_t const image_index) const noexcept
 {
     return image_views_[image_index];
-}
-
-inline void vkchip8::vulkan_swap_chain::resized()
-{
-    framebuffer_resized_ = true;
 }
 
 #endif // !VKCHIP8_VULKAN_SWAP_CHAIN_INCLUDED

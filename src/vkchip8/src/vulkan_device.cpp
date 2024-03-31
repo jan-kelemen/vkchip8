@@ -142,9 +142,6 @@ namespace
     [[nodiscard]] VkSampleCountFlagBits max_usable_sample_count(
         VkPhysicalDevice device)
     {
-        // TODO-JK: Implement multisampling correctly
-        return VK_SAMPLE_COUNT_1_BIT;
-
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(device, &properties);
 

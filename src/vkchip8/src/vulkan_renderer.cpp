@@ -134,7 +134,7 @@ vkchip8::vulkan_renderer::vulkan_renderer(SDL_Window* window,
     , command_buffers_{vulkan_swap_chain::max_frames_in_flight}
     , descriptor_pool_{create_descriptor_pool(device)}
 {
-    recreate_images();
+    recreate();
 
     create_command_buffers(device_,
         command_pool_,
@@ -162,7 +162,7 @@ void vkchip8::vulkan_renderer::draw(screen const& object)
     uint32_t image_index{};
     if (!swap_chain_->acquire_next_image(current_frame_, image_index))
     {
-        recreate_images();
+        recreate();
         return;
     }
 
@@ -172,12 +172,9 @@ void vkchip8::vulkan_renderer::draw(screen const& object)
 
     record_command_buffer(object, command_buffer, image_index);
 
-    if (!swap_chain_->submit_command_buffer(&command_buffer,
-            current_frame_,
-            image_index))
-    {
-        recreate_images();
-    }
+    swap_chain_->submit_command_buffer(&command_buffer,
+        current_frame_,
+        image_index);
 
     current_frame_ =
         (current_frame_ + 1) % vulkan_swap_chain::max_frames_in_flight;
@@ -257,7 +254,7 @@ void vkchip8::vulkan_renderer::record_command_buffer(screen const& object,
     color_attachment_info.clearValue = clear_value;
     if (is_multisampled())
     {
-        //        color_attachment_info.imageView = color_image_view_;
+        color_attachment_info.imageView = color_image_view_;
         color_attachment_info.resolveMode = VK_RESOLVE_MODE_AVERAGE_BIT;
         color_attachment_info.resolveImageView =
             swap_chain_->image_view(image_index);
@@ -301,12 +298,36 @@ bool vkchip8::vulkan_renderer::is_multisampled() const
     return device_->max_msaa_samples() != VK_SAMPLE_COUNT_1_BIT;
 }
 
-void vkchip8::vulkan_renderer::recreate_images()
+void vkchip8::vulkan_renderer::recreate()
 {
     if (is_multisampled())
     {
         cleanup_images();
+
+        create_image(device_->physical(),
+            device_->logical(),
+            swap_chain_->extent(),
+            1,
+            device_->max_msaa_samples(),
+            swap_chain_->image_format(),
+            VK_IMAGE_TILING_OPTIMAL,
+            VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT |
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            color_image_,
+            color_image_memory_);
+
+        color_image_view_ = create_image_view(device_->logical(),
+            color_image_,
+            swap_chain_->image_format(),
+            VK_IMAGE_ASPECT_COLOR_BIT,
+            1);
     }
 }
 
-void vkchip8::vulkan_renderer::cleanup_images() { }
+void vkchip8::vulkan_renderer::cleanup_images()
+{
+    vkDestroyImageView(device_->logical(), color_image_view_, nullptr);
+    vkDestroyImage(device_->logical(), color_image_, nullptr);
+    vkFreeMemory(device_->logical(), color_image_memory_, nullptr);
+}

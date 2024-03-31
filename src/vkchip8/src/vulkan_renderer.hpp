@@ -40,6 +40,8 @@ namespace vkchip8
 
         void draw(screen const& object);
 
+        void recreate();
+
     public: // Operators
         vulkan_renderer& operator=(vulkan_renderer const&) = delete;
 
@@ -54,8 +56,6 @@ namespace vkchip8
 
         [[nodiscard]] bool is_multisampled() const;
 
-        void recreate_images();
-
         void cleanup_images();
 
     private: // Data
@@ -68,6 +68,10 @@ namespace vkchip8
         std::vector<VkCommandBuffer> command_buffers_{};
 
         VkDescriptorPool descriptor_pool_{};
+
+        VkImage color_image_{};
+        VkImageView color_image_view_{};
+        VkDeviceMemory color_image_memory_{};
 
         uint32_t current_frame_{};
     };

@@ -1,3 +1,4 @@
+#include <global_data.hpp>
 #include <screen.hpp>
 #include <vulkan_context.hpp>
 #include <vulkan_device.hpp>
@@ -163,6 +164,19 @@ int main([[maybe_unused]] int argc, char** argv)
                             event.key.keysym.sym);
                     }
                 }
+            }
+
+            if (vkchip8::swap_chain_refresh.load())
+            {
+                while (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED)
+                {
+                    SDL_WaitEvent(nullptr);
+                }
+
+                vkDeviceWaitIdle(device.logical());
+                swap_chain.recreate();
+                renderer.recreate();
+                vkchip8::swap_chain_refresh.store(false);
             }
 
             uint64_t const current_tick{SDL_GetPerformanceCounter()};

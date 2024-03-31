@@ -1,10 +1,12 @@
 #include <vulkan_swap_chain.hpp>
 
+#include <global_data.hpp>
 #include <vulkan_context.hpp>
 #include <vulkan_device.hpp>
 #include <vulkan_utility.hpp>
 
 #include <SDL.h>
+#include <SDL_video.h>
 
 #include <algorithm>
 #include <array>
@@ -221,7 +223,7 @@ bool vkchip8::vulkan_swap_chain::acquire_next_image(
         &image_index)};
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
-        recreate();
+        swap_chain_refresh.store(true);
         return false;
     }
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
@@ -233,7 +235,7 @@ bool vkchip8::vulkan_swap_chain::acquire_next_image(
     return true;
 }
 
-bool vkchip8::vulkan_swap_chain::submit_command_buffer(
+void vkchip8::vulkan_swap_chain::submit_command_buffer(
     VkCommandBuffer const* const command_buffer,
     uint32_t const current_frame,
     uint32_t const image_index)
@@ -261,43 +263,27 @@ bool vkchip8::vulkan_swap_chain::submit_command_buffer(
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
-    std::array swapchains{chain_};
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.waitSemaphoreCount = 1;
     present_info.pWaitSemaphores = signal_semaphores.data();
     present_info.swapchainCount = 1;
-    present_info.pSwapchains = swapchains.data();
+    present_info.pSwapchains = &chain_;
     present_info.pImageIndices = &image_index;
 
     VkResult result{vkQueuePresentKHR(present_queue_, &present_info)};
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-        framebuffer_resized_)
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
     {
-        recreate();
-        framebuffer_resized_ = false;
-        return false;
+        swap_chain_refresh.store(true);
     }
     else if (result != VK_SUCCESS)
     {
         throw std::runtime_error{"failed to present swap chain image!"};
     }
-
-    return true;
 }
 
 void vkchip8::vulkan_swap_chain::recreate()
 {
-    int width{};
-    int height{};
-    SDL_GetWindowSize(window_, &width, &height);
-    while (width == 0 || height == 0)
-    {
-        SDL_GetWindowSize(window_, &width, &height);
-        SDL_WaitEvent(nullptr);
-    }
-
-    vkDeviceWaitIdle(device_->logical());
     cleanup();
     create_chain_and_images();
 }

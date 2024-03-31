@@ -2,6 +2,8 @@ add_executable(vkchip8)
 
 target_sources(vkchip8
     PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/global_data.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/global_data.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.cpp
@@ -87,6 +89,7 @@ endif()
 
 source_group("Header Files"
     FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/global_data.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc_speaker.hpp
@@ -101,6 +104,7 @@ source_group("Header Files"
 
 source_group("Source Files"
     FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/global_data.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_sdl2.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc_speaker.cpp
