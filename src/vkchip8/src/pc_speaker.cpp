@@ -60,5 +60,5 @@ void vkchip8::pc_speaker::beep()
     SDL_PauseAudioDevice(device_id_, 0);
     beep_on_ = true;
     beep_until_ =
-        std::chrono::steady_clock::now() + std::chrono::milliseconds{500};
+        std::chrono::steady_clock::now() + std::chrono::milliseconds{100};
 }

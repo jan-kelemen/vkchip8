@@ -80,8 +80,8 @@ void vkchip8::chip8::tick_timers()
         if (sound_timer_ == 1)
         {
             beep_callback_();
-            --sound_timer_;
         }
+        --sound_timer_;
     }
 }
 
