@@ -128,7 +128,7 @@ int main([[maybe_unused]] int argc, char** argv)
             swap_chain.image_format(),
             swap_chain.image_count());
 
-        // Main loop
+        uint64_t last_tick{SDL_GetPerformanceCounter()};
         bool done = false;
         while (!done)
         {
@@ -164,6 +164,13 @@ int main([[maybe_unused]] int argc, char** argv)
                     }
                 }
             }
+
+            uint64_t const current_tick{SDL_GetPerformanceCounter()};
+            if (current_tick - last_tick <= SDL_GetPerformanceFrequency() / 60)
+            {
+                continue;
+            }
+            last_tick = current_tick;
 
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplSDL2_NewFrame();
