@@ -9,7 +9,16 @@
 #include <limits>
 #include <stdexcept>
 
-// vulkan_window implementation
+vkchip8::sdl_guard::sdl_guard(uint32_t const flags)
+{
+    if (SDL_Init(flags) != 0)
+    {
+        throw std::runtime_error{SDL_GetError()};
+    }
+    SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+}
+
+vkchip8::sdl_guard::~sdl_guard() { SDL_Quit(); }
 
 vkchip8::sdl_window::sdl_window(std::string_view const title,
     SDL_WindowFlags const window_flags,

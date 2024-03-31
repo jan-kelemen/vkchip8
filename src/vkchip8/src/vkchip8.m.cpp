@@ -14,9 +14,6 @@
 #include "imgui_impl_vulkan.hpp"
 #include <SDL.h>
 
-#include <SDL_vulkan.h>
-#include <stdio.h> // printf, fprintf
-#include <stdlib.h> // abort
 #include <vulkan/vulkan.h>
 
 #include <spdlog/spdlog.h>
@@ -79,21 +76,9 @@ namespace
 // Main code
 int main([[maybe_unused]] int argc, char** argv)
 {
-    // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        return -1;
-    }
+    vkchip8::sdl_guard sdl_guard{SDL_INIT_VIDEO | SDL_INIT_AUDIO};
 
-    // From 2.0.18: Enable native IME.
-#ifdef SDL_HINT_IME_SHOW_UI
-    SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-#endif
-
-    using namespace std::string_view_literals;
-
-    vkchip8::sdl_window window{"vkchip8"sv,
+    vkchip8::sdl_window window{"vkchip8",
         static_cast<SDL_WindowFlags>(
             SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI),
         true,
@@ -107,8 +92,7 @@ int main([[maybe_unused]] int argc, char** argv)
         std::random_device{}(),
         [&speaker]() { speaker.beep(); }};
 
-    emulator.load(
-        std::span{reinterpret_cast<std::byte*>(code.data()), code.size()});
+    emulator.load(vkchip8::as_bytes(code));
 
     {
         auto context{
@@ -210,7 +194,5 @@ int main([[maybe_unused]] int argc, char** argv)
         screen_renderer.detach_renderer();
     }
 
-    SDL_Quit();
-
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -86,7 +86,7 @@ void vkchip8::chip8::key_event(key_event_type type, key_code code)
     keys_.set(static_cast<size_t>(code), static_cast<bool>(type));
 }
 
-void vkchip8::chip8::load(std::span<std::byte> program, uint16_t address)
+void vkchip8::chip8::load(std::span<std::byte const> program, uint16_t address)
 {
     reset();
     std::ranges::copy(program, std::next(std::begin(memory_), start_address));

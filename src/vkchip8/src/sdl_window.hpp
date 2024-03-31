@@ -10,6 +10,24 @@
 
 namespace vkchip8
 {
+    class [[nodiscard]] sdl_guard final
+    {
+    public: // Construction
+        sdl_guard(uint32_t flags);
+
+        sdl_guard(sdl_guard const&) = delete;
+
+        sdl_guard(sdl_guard&&) noexcept = delete;
+
+    public: // Destruction
+        ~sdl_guard();
+
+    public: // Operators
+        sdl_guard& operator=(sdl_guard const&) = delete;
+
+        sdl_guard& operator=(sdl_guard&&) = delete;
+    };
+
     class [[nodiscard]] sdl_window final : public vulkan_window
     {
     public: // Construction

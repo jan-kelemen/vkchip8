@@ -67,7 +67,7 @@ namespace vkchip8
 
         void key_event(key_event_type type, key_code code);
 
-        void load(std::span<std::byte> program,
+        void load(std::span<std::byte const> program,
             uint16_t address = start_address);
 
         [[nodiscard]] std::array<std::bitset<screen_width>,
