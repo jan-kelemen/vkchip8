@@ -201,71 +201,26 @@ vkchip8::screen::screen(chip8* device)
 {
 }
 
-vkchip8::screen::~screen()
-{
-    if (render_device_)
-    {
-        for (auto& data : frame_data_)
-        {
-            vkFreeDescriptorSets(render_device_->logical(),
-                descriptor_pool_,
-                1,
-                &data.descriptor_set_);
+vkchip8::screen::~screen() { detach_renderer(); }
 
-            vkDestroyBuffer(render_device_->logical(),
-                data.instance_buffer_,
-                nullptr);
-            vkFreeMemory(render_device_->logical(),
-                data.instance_memory_,
-                nullptr);
-
-            vkDestroyBuffer(render_device_->logical(),
-                data.vertex_uniform_buffer_,
-                nullptr);
-            vkFreeMemory(render_device_->logical(),
-                data.vertex_uniform_memory_,
-                nullptr);
-
-            vkDestroyBuffer(render_device_->logical(),
-                data.fragment_uniform_buffer_,
-                nullptr);
-            vkFreeMemory(render_device_->logical(),
-                data.fragment_uniform_memory_,
-                nullptr);
-        }
-
-        pipeline_.reset();
-        vkDestroyDescriptorSetLayout(render_device_->logical(),
-            descriptor_set_layout_,
-            nullptr);
-
-        vkDestroyBuffer(render_device_->logical(), vert_index_buffer_, nullptr);
-        vkFreeMemory(render_device_->logical(), vert_index_memory_, nullptr);
-    }
-}
-
-void vkchip8::screen::attach_renderer(vulkan_device* const device,
-    VkDescriptorPool const descriptor_pool,
-    VkFormat const image_format,
+void vkchip8::screen::attach_renderer_impl(VkFormat const image_format,
     uint32_t const frames_in_flight)
 {
-    render_device_ = device;
-    descriptor_pool_ = descriptor_pool;
-
-    descriptor_set_layout_ = create_descriptor_set_layout(device);
+    descriptor_set_layout_ = create_descriptor_set_layout(vulkan_device_);
 
     pipeline_ = std::make_unique<vulkan_pipeline>(
-        vulkan_pipeline_builder{device, image_format}
+        vulkan_pipeline_builder{vulkan_device_, image_format}
             .add_shader(VK_SHADER_STAGE_VERTEX_BIT, "vert.spv", "main")
             .add_shader(VK_SHADER_STAGE_FRAGMENT_BIT, "frag.spv", "main")
-            .with_rasterization_samples(device->max_msaa_samples())
+            .with_rasterization_samples(vulkan_device_->max_msaa_samples())
             .add_vertex_input(binding_description(), attribute_descriptions())
             .add_descriptor_set_layout(descriptor_set_layout_)
             .build());
 
     VkDeviceSize const vert_index_size{vertices_.size() * sizeof(vertices_[0]) +
         indices_.size() * sizeof(indices_[0])};
-    std::tie(vert_index_buffer_, vert_index_memory_) = create_buffer(device,
+    std::tie(vert_index_buffer_, vert_index_memory_) = create_buffer(
+        vulkan_device_,
         vert_index_size,
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
@@ -273,7 +228,7 @@ void vkchip8::screen::attach_renderer(vulkan_device* const device,
 
     {
         void* data{};
-        vkMapMemory(device->logical(),
+        vkMapMemory(vulkan_device_->logical(),
             vert_index_memory_,
             0,
             vert_index_size,
@@ -289,7 +244,7 @@ void vkchip8::screen::attach_renderer(vulkan_device* const device,
             indices_.size() * sizeof(indices_[0]),
             index_memory_start);
 
-        vkUnmapMemory(device->logical(), vert_index_memory_);
+        vkUnmapMemory(vulkan_device_->logical(), vert_index_memory_);
     }
 
     frame_data_.resize(frames_in_flight);
@@ -297,38 +252,38 @@ void vkchip8::screen::attach_renderer(vulkan_device* const device,
     {
         frame_data& data{frame_data_[i]};
         std::tie(data.instance_buffer_, data.instance_memory_) =
-            create_buffer(device,
+            create_buffer(vulkan_device_,
                 sizeof(glm::fvec2) * chip8::screen_width * chip8::screen_width,
                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         std::tie(data.vertex_uniform_buffer_, data.vertex_uniform_memory_) =
-            create_buffer(device,
+            create_buffer(vulkan_device_,
                 sizeof(glm::fvec2),
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         std::tie(data.fragment_uniform_buffer_, data.fragment_uniform_memory_) =
-            create_buffer(device,
+            create_buffer(vulkan_device_,
                 sizeof(glm::fvec2),
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        data.descriptor_set_ = create_descriptor_set(device,
+        data.descriptor_set_ = create_descriptor_set(vulkan_device_,
             descriptor_set_layout_,
-            descriptor_pool);
+            descriptor_pool_);
 
-        bind_descriptor_set(device,
+        bind_descriptor_set(vulkan_device_,
             data.descriptor_set_,
             data.vertex_uniform_buffer_,
             data.fragment_uniform_buffer_);
     }
 }
 
-void vkchip8::screen::render(VkCommandBuffer command_buffer,
+void vkchip8::screen::render_impl(VkCommandBuffer command_buffer,
     VkExtent2D const extent,
     uint32_t const frame_index) const
 {
@@ -336,7 +291,7 @@ void vkchip8::screen::render(VkCommandBuffer command_buffer,
         2.f / chip8::screen_height};
     {
         void* data{};
-        vkMapMemory(render_device_->logical(),
+        vkMapMemory(vulkan_device_->logical(),
             frame_data_[frame_index].vertex_uniform_memory_,
             0,
             sizeof(glm::fvec2),
@@ -345,13 +300,13 @@ void vkchip8::screen::render(VkCommandBuffer command_buffer,
 
         memcpy(data, &pixel_scale, sizeof(pixel_scale));
 
-        vkUnmapMemory(render_device_->logical(),
+        vkUnmapMemory(vulkan_device_->logical(),
             frame_data_[frame_index].vertex_uniform_memory_);
     }
 
     {
         void* data{};
-        vkMapMemory(render_device_->logical(),
+        vkMapMemory(vulkan_device_->logical(),
             frame_data_[frame_index].fragment_uniform_memory_,
             0,
             sizeof(glm::fvec2),
@@ -361,14 +316,14 @@ void vkchip8::screen::render(VkCommandBuffer command_buffer,
         glm::fvec4 pixel_color{1.0f, 1.0f, 1.0f, 0.0f};
         memcpy(data, &pixel_color, sizeof(pixel_color));
 
-        vkUnmapMemory(render_device_->logical(),
+        vkUnmapMemory(vulkan_device_->logical(),
             frame_data_[frame_index].fragment_uniform_memory_);
     }
 
     uint32_t on_pixels{};
 
     void* data{};
-    vkMapMemory(render_device_->logical(),
+    vkMapMemory(vulkan_device_->logical(),
         frame_data_[frame_index].instance_memory_,
         0,
         sizeof(glm::fvec2) * chip8::screen_width * chip8::screen_width,
@@ -394,7 +349,7 @@ void vkchip8::screen::render(VkCommandBuffer command_buffer,
         }
     }
 
-    vkUnmapMemory(render_device_->logical(),
+    vkUnmapMemory(vulkan_device_->logical(),
         frame_data_[frame_index].instance_memory_);
 
     vkCmdBindPipeline(command_buffer,
@@ -446,4 +401,47 @@ void vkchip8::screen::render(VkCommandBuffer command_buffer,
         0,
         0,
         0);
+}
+
+void vkchip8::screen::detach_renderer_impl()
+{
+    if (vulkan_device_)
+    {
+        for (auto& data : frame_data_)
+        {
+            vkFreeDescriptorSets(vulkan_device_->logical(),
+                descriptor_pool_,
+                1,
+                &data.descriptor_set_);
+
+            vkDestroyBuffer(vulkan_device_->logical(),
+                data.instance_buffer_,
+                nullptr);
+            vkFreeMemory(vulkan_device_->logical(),
+                data.instance_memory_,
+                nullptr);
+
+            vkDestroyBuffer(vulkan_device_->logical(),
+                data.vertex_uniform_buffer_,
+                nullptr);
+            vkFreeMemory(vulkan_device_->logical(),
+                data.vertex_uniform_memory_,
+                nullptr);
+
+            vkDestroyBuffer(vulkan_device_->logical(),
+                data.fragment_uniform_buffer_,
+                nullptr);
+            vkFreeMemory(vulkan_device_->logical(),
+                data.fragment_uniform_memory_,
+                nullptr);
+        }
+
+        pipeline_.reset();
+        vkDestroyDescriptorSetLayout(vulkan_device_->logical(),
+            descriptor_set_layout_,
+            nullptr);
+
+        vkDestroyBuffer(vulkan_device_->logical(), vert_index_buffer_, nullptr);
+        vkFreeMemory(vulkan_device_->logical(), vert_index_memory_, nullptr);
+    }
 }

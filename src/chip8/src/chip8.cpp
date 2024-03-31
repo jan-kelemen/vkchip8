@@ -11,11 +11,6 @@ namespace
     [[nodiscard]] constexpr std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>
     individual_digits(uint16_t const operation)
     {
-        auto a1 = operation & 0xF0'00;
-        auto a2 = operation & 0x0F'00;
-        auto a3 = operation & 0x00'F0;
-        auto a4 = operation & 0x00'0F;
-
         return {static_cast<uint8_t>((operation & 0xF0'00) >> 12),
             static_cast<uint8_t>((operation & 0x0F'00) >> 8),
             static_cast<uint8_t>((operation & 0x00'F0) >> 4),

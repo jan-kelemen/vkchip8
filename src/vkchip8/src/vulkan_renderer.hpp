@@ -5,16 +5,16 @@
 
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <vector>
 
 struct SDL_Window;
 
 namespace vkchip8
 {
-    class screen;
-
     class vulkan_context;
     class vulkan_device;
+    class vulkan_render_target;
     class vulkan_swap_chain;
 } // namespace vkchip8
 
@@ -38,7 +38,7 @@ namespace vkchip8
     public: // Interface
         [[nodiscard]] constexpr VkDescriptorPool descriptor_pool() noexcept;
 
-        void draw(screen const& object);
+        void draw(std::span<vulkan_render_target const*> targets);
 
         void recreate();
 
@@ -50,7 +50,8 @@ namespace vkchip8
     private: // Helpers
         void init_imgui();
 
-        void record_command_buffer(screen const& object,
+        void record_command_buffer(
+            std::span<vulkan_render_target const*> targets,
             VkCommandBuffer& command_buffer,
             uint32_t image_index);
 

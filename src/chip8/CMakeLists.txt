@@ -38,13 +38,3 @@ if (VKCHIP8_BUILD_TESTS)
         catch_discover_tests(chip8_test)
     endif()
 endif()
-
-source_group("Header Files"
-    FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/chip8.hpp
-)
-
-source_group("Source Files"
-    FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/chip8.cpp
-)

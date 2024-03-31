@@ -11,6 +11,7 @@
 #include <imgui_impl_sdl2.hpp>
 #include <imgui_impl_vulkan.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <span>
@@ -157,7 +158,8 @@ vkchip8::vulkan_renderer::~vulkan_renderer()
     cleanup_images();
 }
 
-void vkchip8::vulkan_renderer::draw(screen const& object)
+void vkchip8::vulkan_renderer::draw(
+    std::span<vulkan_render_target const*> targets)
 {
     uint32_t image_index{};
     if (!swap_chain_->acquire_next_image(current_frame_, image_index))
@@ -170,7 +172,7 @@ void vkchip8::vulkan_renderer::draw(screen const& object)
 
     vkResetCommandBuffer(command_buffer, 0);
 
-    record_command_buffer(object, command_buffer, image_index);
+    record_command_buffer(targets, command_buffer, image_index);
 
     swap_chain_->submit_command_buffer(&command_buffer,
         current_frame_,
@@ -227,7 +229,8 @@ void vkchip8::vulkan_renderer::init_imgui()
     ImGui_ImplVulkan_Init(&init_info);
 }
 
-void vkchip8::vulkan_renderer::record_command_buffer(screen const& object,
+void vkchip8::vulkan_renderer::record_command_buffer(
+    std::span<vulkan_render_target const*> targets,
     VkCommandBuffer& command_buffer,
     uint32_t const image_index)
 {
@@ -275,7 +278,9 @@ void vkchip8::vulkan_renderer::record_command_buffer(screen const& object,
 
     vkCmdBeginRendering(command_buffer, &render_info);
 
-    object.render(command_buffer, swap_chain_->extent(), current_frame_);
+    std::ranges::for_each(targets,
+        [&, this](auto&& o)
+        { o->render(command_buffer, swap_chain_->extent(), current_frame_); });
 
     ImGui::Render();
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);

@@ -211,9 +211,15 @@ int main([[maybe_unused]] int argc, char** argv)
             emulator.tick_timers();
             speaker.tick();
 
-            renderer.draw(screen_renderer);
+            std::array render_targets{
+                static_cast<vkchip8::vulkan_render_target const*>(
+                    &screen_renderer)};
+
+            renderer.draw(render_targets);
         }
         vkDeviceWaitIdle(device.logical());
+
+        screen_renderer.detach_renderer();
     }
 
     SDL_DestroyWindow(window);

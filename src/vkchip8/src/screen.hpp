@@ -1,6 +1,8 @@
 #ifndef VKCHIP8_SCREEN_INCLUDED
 #define VKCHIP8_SCREEN_INCLUDED
 
+#include <vulkan_render_target.hpp>
+
 #include <vulkan/vulkan_core.h>
 
 #include <glm/glm.hpp>
@@ -18,32 +20,32 @@ namespace vkchip8
 
 namespace vkchip8
 {
-    class [[nodiscard]] screen final
+    class [[nodiscard]] screen final : public vulkan_render_target
     {
     public: // Construction
         screen(chip8* device);
 
         screen(screen const&) = delete;
 
-        screen(screen&&) noexcept = default;
+        screen(screen&&) noexcept = delete;
 
     public: // Destruction
-        ~screen();
+        ~screen() override;
 
-    public: // Interface
-        void attach_renderer(vulkan_device* device,
-            VkDescriptorPool descriptor_pool,
-            VkFormat image_format,
-            uint32_t frames_in_flight);
+    private: // vulkan_render_target implementation
+        void attach_renderer_impl(VkFormat image_format,
+            uint32_t frames_in_flight) override;
 
-        void render(VkCommandBuffer command_buffer,
+        void render_impl(VkCommandBuffer command_buffer,
             VkExtent2D extent,
-            uint32_t frame_index) const;
+            uint32_t frame_index) const override;
+
+        void detach_renderer_impl() override;
 
     public: // Operators
         screen& operator=(screen const&) = delete;
 
-        screen& operator=(screen&&) noexcept = default;
+        screen& operator=(screen&&) noexcept = delete;
 
     private: // Types
         struct [[nodiscard]] frame_data final
@@ -59,8 +61,6 @@ namespace vkchip8
 
     private: // Data
         chip8* device_{};
-        vulkan_device* render_device_{};
-        VkDescriptorPool descriptor_pool_{};
 
         std::vector<glm::fvec2> vertices_;
         std::vector<uint16_t> indices_;

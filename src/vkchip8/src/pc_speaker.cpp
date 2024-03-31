@@ -8,7 +8,7 @@
 
 namespace
 {
-    void callback(void* userdata, Uint8* stream, int len)
+    void callback([[maybe_unused]] void* userdata, Uint8* stream, int len)
     {
         static float time = 0;
         static float freq = 440;
