@@ -201,23 +201,26 @@ void vkchip8::chip8::execute(uint16_t operation)
     {
         // Set VX to VX OR VY
         data_registers_[digit2] |= data_registers_[digit3];
+        data_registers_[0xF] = {};
     }
     else if (digit1 == 0x8 && digit4 == 0x2)
     {
         // Set VX to VX AND VY
         data_registers_[digit2] &= data_registers_[digit3];
+        data_registers_[0xF] = {};
     }
     else if (digit1 == 0x8 && digit4 == 0x3)
     {
         // Set VX to VX XOR VY
         data_registers_[digit2] ^= data_registers_[digit3];
+        data_registers_[0xF] = {};
     }
     else if (digit1 == 0x8 && digit4 == 0x4)
     {
         // Add VY to VX with carry to VF
         auto const vx{data_registers_[digit2]};
         auto const vy{data_registers_[digit3]};
-        auto const res{vx + vy};
+        auto const res{static_cast<uint8_t>(vx + vy)};
         data_registers_[digit2] = res;
         data_registers_[0xF] = res < vy;
     }
@@ -251,7 +254,7 @@ void vkchip8::chip8::execute(uint16_t operation)
         // Left shift VY by 1 to VX with carry to VF
         auto const vy{data_registers_[digit3]};
         data_registers_[digit2] = vy << 1;
-        data_registers_[0xF] = vy & 0x80;
+        data_registers_[0xF] = (vy & 0x80) != 0;
     }
     else if (digit1 == 0x9 && digit4 == 0x0)
     {
