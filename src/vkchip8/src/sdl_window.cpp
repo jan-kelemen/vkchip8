@@ -1,0 +1,83 @@
+#include <sdl_window.hpp>
+
+#include <imgui_impl_sdl2.hpp>
+
+#include <SDL.h>
+#include <SDL_vulkan.h>
+
+#include <algorithm>
+#include <limits>
+#include <stdexcept>
+
+// vulkan_window implementation
+
+vkchip8::sdl_window::sdl_window(std::string_view const title,
+    SDL_WindowFlags const window_flags,
+    bool const centered,
+    int const width,
+    int const height)
+    : window_{SDL_CreateWindow(title.data(),
+          centered ? SDL_WINDOWPOS_CENTERED : SDL_WINDOWPOS_UNDEFINED,
+          centered ? SDL_WINDOWPOS_CENTERED : SDL_WINDOWPOS_UNDEFINED,
+          width,
+          height,
+          window_flags | SDL_WINDOW_VULKAN)}
+{
+    if (window_ == nullptr)
+    {
+        throw std::runtime_error{SDL_GetError()};
+    }
+}
+
+vkchip8::sdl_window::~sdl_window() { SDL_DestroyWindow(window_); }
+
+std::vector<char const*> vkchip8::sdl_window::required_extensions() const
+{
+    unsigned int extension_count{};
+    SDL_Vulkan_GetInstanceExtensions(window_, &extension_count, nullptr);
+    std::vector<char const*> required_extensions(extension_count, nullptr);
+    SDL_Vulkan_GetInstanceExtensions(window_,
+        &extension_count,
+        required_extensions.data());
+
+    return required_extensions;
+}
+
+bool vkchip8::sdl_window::create_surface(VkInstance instance,
+    VkSurfaceKHR& surface) const
+{
+    return SDL_Vulkan_CreateSurface(window_, instance, &surface) == SDL_TRUE;
+}
+
+VkExtent2D vkchip8::sdl_window::swap_extent(
+    VkSurfaceCapabilitiesKHR const& capabilities) const
+{
+    if (capabilities.currentExtent.width !=
+        std::numeric_limits<uint32_t>::max())
+    {
+        return capabilities.currentExtent;
+    }
+
+    int width{};
+    int height{};
+    SDL_GetWindowSize(window_, &width, &height);
+
+    VkExtent2D actual_extent = {static_cast<uint32_t>(width),
+        static_cast<uint32_t>(height)};
+
+    actual_extent.width = std::clamp(actual_extent.width,
+        capabilities.minImageExtent.width,
+        capabilities.maxImageExtent.width);
+    actual_extent.height = std::clamp(actual_extent.height,
+        capabilities.minImageExtent.height,
+        capabilities.maxImageExtent.height);
+
+    return actual_extent;
+}
+
+void vkchip8::sdl_window::init_imgui()
+{
+    ImGui_ImplSDL2_InitForVulkan(window_);
+}
+
+void vkchip8::sdl_window::shutdown_imgui() { ImGui_ImplSDL2_Shutdown(); }

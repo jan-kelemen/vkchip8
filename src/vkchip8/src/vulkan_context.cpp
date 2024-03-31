@@ -1,9 +1,7 @@
 #include <vulkan_context.hpp>
 
 #include <vulkan_utility.hpp>
-
-#include <SDL.h>
-#include <SDL_vulkan.h>
+#include <vulkan_window.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -177,7 +175,8 @@ vkchip8::vulkan_context& vkchip8::vulkan_context::operator=(
     return *this;
 }
 
-vkchip8::vulkan_context vkchip8::create_context(SDL_Window* const window,
+vkchip8::vulkan_context vkchip8::create_context(
+    vkchip8::vulkan_window* const window,
     bool const setup_validation_layers)
 {
     VkApplicationInfo app_info{};
@@ -190,12 +189,7 @@ vkchip8::vulkan_context vkchip8::create_context(SDL_Window* const window,
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.pApplicationInfo = &app_info;
 
-    unsigned int extension_count{};
-    SDL_Vulkan_GetInstanceExtensions(window, &extension_count, nullptr);
-    std::vector<char const*> required_extensions(extension_count, nullptr);
-    SDL_Vulkan_GetInstanceExtensions(window,
-        &extension_count,
-        required_extensions.data());
+    std::vector<char const*> required_extensions{window->required_extensions()};
 
     bool has_debug_utils_extension{setup_validation_layers};
     VkDebugUtilsMessengerCreateInfoEXT debug_create_info;
@@ -240,7 +234,7 @@ vkchip8::vulkan_context vkchip8::create_context(SDL_Window* const window,
     }
 
     VkSurfaceKHR surface{};
-    if (SDL_Vulkan_CreateSurface(window, instance, &surface) == SDL_FALSE)
+    if (!window->create_surface(instance, surface))
     {
         if (debug_messenger)
         {

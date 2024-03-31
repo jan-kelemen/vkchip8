@@ -6,9 +6,9 @@
 #include <vulkan_device.hpp>
 #include <vulkan_swap_chain.hpp>
 #include <vulkan_utility.hpp>
+#include <vulkan_window.hpp>
 
 #include <imgui.h>
-#include <imgui_impl_sdl2.hpp>
 #include <imgui_impl_vulkan.hpp>
 
 #include <algorithm>
@@ -123,7 +123,7 @@ namespace
     }
 } // namespace
 
-vkchip8::vulkan_renderer::vulkan_renderer(SDL_Window* window,
+vkchip8::vulkan_renderer::vulkan_renderer(vulkan_window* window,
     vulkan_context* context,
     vulkan_device* device,
     vulkan_swap_chain* swap_chain)
@@ -148,7 +148,7 @@ vkchip8::vulkan_renderer::vulkan_renderer(SDL_Window* window,
 vkchip8::vulkan_renderer::~vulkan_renderer()
 {
     ImGui_ImplVulkan_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    window_->shutdown_imgui();
     ImGui::DestroyContext();
 
     vkDestroyDescriptorPool(device_->logical(), descriptor_pool_, nullptr);
@@ -199,8 +199,7 @@ void vkchip8::vulkan_renderer::init_imgui()
     ImGui::GetStyle().Colors[ImGuiCol_TitleBgActive] =
         ImVec4(0.32f, 0.32f, 0.63f, 1.00f);
 
-    // Setup Platform/Renderer backends
-    ImGui_ImplSDL2_InitForVulkan(window_);
+    window_->init_imgui();
 
     VkPipelineRenderingCreateInfoKHR rendering_create_info{};
     rendering_create_info.sType =

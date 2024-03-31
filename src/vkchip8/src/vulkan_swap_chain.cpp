@@ -4,9 +4,7 @@
 #include <vulkan_context.hpp>
 #include <vulkan_device.hpp>
 #include <vulkan_utility.hpp>
-
-#include <SDL.h>
-#include <SDL_video.h>
+#include <vulkan_window.hpp>
 
 #include <algorithm>
 #include <array>
@@ -45,32 +43,6 @@ namespace
                 available_present_modes.cend()
             ? preferred_mode
             : VK_PRESENT_MODE_FIFO_KHR;
-    }
-
-    [[nodiscard]] VkExtent2D choose_swap_extent(SDL_Window* const window,
-        VkSurfaceCapabilitiesKHR const& capabilities)
-    {
-        if (capabilities.currentExtent.width !=
-            std::numeric_limits<uint32_t>::max())
-        {
-            return capabilities.currentExtent;
-        }
-
-        int width{};
-        int height{};
-        SDL_GetWindowSize(window, &width, &height);
-
-        VkExtent2D actual_extent = {static_cast<uint32_t>(width),
-            static_cast<uint32_t>(height)};
-
-        actual_extent.width = std::clamp(actual_extent.width,
-            capabilities.minImageExtent.width,
-            capabilities.maxImageExtent.width);
-        actual_extent.height = std::clamp(actual_extent.height,
-            capabilities.minImageExtent.height,
-            capabilities.maxImageExtent.height);
-
-        return actual_extent;
     }
 
     [[nodiscard]] VkSemaphore create_semaphore(
@@ -152,7 +124,7 @@ vkchip8::query_swap_chain_support(VkPhysicalDevice device, VkSurfaceKHR surface)
     return rv;
 }
 
-vkchip8::vulkan_swap_chain::vulkan_swap_chain(SDL_Window* window,
+vkchip8::vulkan_swap_chain::vulkan_swap_chain(vulkan_window* window,
     vulkan_context* context,
     vulkan_device* device)
     : window_{window}
@@ -322,7 +294,7 @@ void vkchip8::vulkan_swap_chain::create_chain_and_images()
         choose_swap_surface_format(swap_details.surface_formats)};
 
     image_format_ = surface_format.format;
-    extent_ = choose_swap_extent(window_, swap_details.capabilities);
+    extent_ = window_->swap_extent(swap_details.capabilities);
     min_image_count_ = swap_details.capabilities.minImageCount;
 
     uint32_t image_count{min_image_count_ + 1};

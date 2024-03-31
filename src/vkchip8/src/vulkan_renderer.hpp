@@ -8,14 +8,13 @@
 #include <span>
 #include <vector>
 
-struct SDL_Window;
-
 namespace vkchip8
 {
     class vulkan_context;
     class vulkan_device;
     class vulkan_render_target;
     class vulkan_swap_chain;
+    class vulkan_window;
 } // namespace vkchip8
 
 namespace vkchip8
@@ -23,7 +22,7 @@ namespace vkchip8
     class [[nodiscard]] vulkan_renderer final
     {
     public: // Construction
-        vulkan_renderer(SDL_Window* window,
+        vulkan_renderer(vulkan_window* window,
             vulkan_context* context,
             vulkan_device* device,
             vulkan_swap_chain* swap_chain);
@@ -60,7 +59,7 @@ namespace vkchip8
         void cleanup_images();
 
     private: // Data
-        SDL_Window* window_;
+        vulkan_window* window_;
         vulkan_context* context_;
         vulkan_device* device_;
         vulkan_swap_chain* swap_chain_;

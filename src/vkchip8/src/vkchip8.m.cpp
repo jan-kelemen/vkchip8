@@ -1,5 +1,6 @@
 #include <global_data.hpp>
 #include <screen.hpp>
+#include <sdl_window.hpp>
 #include <vulkan_context.hpp>
 #include <vulkan_device.hpp>
 #include <vulkan_renderer.hpp>
@@ -90,20 +91,14 @@ int main([[maybe_unused]] int argc, char** argv)
     SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 #endif
 
-    // Create window with Vulkan graphics context
-    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_VULKAN |
-        SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window* window = SDL_CreateWindow("vkchip8",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
+    using namespace std::string_view_literals;
+
+    vkchip8::sdl_window window{"vkchip8"sv,
+        static_cast<SDL_WindowFlags>(
+            SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI),
+        true,
         1280,
-        720,
-        window_flags);
-    if (window == nullptr)
-    {
-        printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
-        return -1;
-    }
+        720};
 
     vkchip8::pc_speaker speaker;
 
@@ -116,10 +111,11 @@ int main([[maybe_unused]] int argc, char** argv)
         std::span{reinterpret_cast<std::byte*>(code.data()), code.size()});
 
     {
-        auto context{vkchip8::create_context(window, enable_validation_layers)};
+        auto context{
+            vkchip8::create_context(&window, enable_validation_layers)};
         auto device{vkchip8::create_device(context)};
-        vkchip8::vulkan_swap_chain swap_chain{window, &context, &device};
-        vkchip8::vulkan_renderer renderer{window,
+        vkchip8::vulkan_swap_chain swap_chain{&window, &context, &device};
+        vkchip8::vulkan_renderer renderer{&window,
             &context,
             &device,
             &swap_chain};
@@ -144,7 +140,8 @@ int main([[maybe_unused]] int argc, char** argv)
                 }
                 if (event.type == SDL_WINDOWEVENT &&
                     event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                    event.window.windowID == SDL_GetWindowID(window))
+                    event.window.windowID ==
+                        SDL_GetWindowID(window.native_handle()))
                 {
                     done = true;
                 }
@@ -169,7 +166,8 @@ int main([[maybe_unused]] int argc, char** argv)
 
             if (vkchip8::swap_chain_refresh.load())
             {
-                while (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED)
+                while (SDL_GetWindowFlags(window.native_handle()) &
+                    SDL_WINDOW_MINIMIZED)
                 {
                     SDL_WaitEvent(nullptr);
                 }
@@ -212,7 +210,6 @@ int main([[maybe_unused]] int argc, char** argv)
         screen_renderer.detach_renderer();
     }
 
-    SDL_DestroyWindow(window);
     SDL_Quit();
 
     return 0;

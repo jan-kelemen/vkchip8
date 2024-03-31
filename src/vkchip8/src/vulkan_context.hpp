@@ -5,7 +5,10 @@
 
 #include <optional>
 
-struct SDL_Window;
+namespace vkchip8
+{
+    class vulkan_window;
+} // namespace vkchip8
 
 namespace vkchip8
 {
@@ -39,7 +42,7 @@ namespace vkchip8
         VkSurfaceKHR surface_;
     };
 
-    vulkan_context create_context(SDL_Window* window,
+    vulkan_context create_context(vulkan_window* window,
         bool setup_validation_layers);
 } // namespace vkchip8
 

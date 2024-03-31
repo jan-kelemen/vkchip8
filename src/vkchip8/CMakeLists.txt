@@ -12,6 +12,8 @@ target_sources(vkchip8
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pc_speaker.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/screen.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/screen.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl_window.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl_window.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_context.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_device.cpp
@@ -26,7 +28,7 @@ target_sources(vkchip8
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_swap_chain.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_utility.hpp
-        
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_window.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/vkchip8.m.cpp
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/shaders/shader.vert

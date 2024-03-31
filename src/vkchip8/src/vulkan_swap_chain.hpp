@@ -8,12 +8,11 @@
 #include <cstdint>
 #include <vector>
 
-struct SDL_Window;
-
 namespace vkchip8
 {
     class vulkan_context;
     class vulkan_device;
+    class vulkan_window;
 } // namespace vkchip8
 
 namespace vkchip8
@@ -34,7 +33,7 @@ namespace vkchip8
         static constexpr int max_frames_in_flight{2};
 
     public: // Construction
-        vulkan_swap_chain(SDL_Window* window,
+        vulkan_swap_chain(vulkan_window* window,
             vulkan_context* context,
             vulkan_device* device);
 
@@ -107,7 +106,7 @@ namespace vkchip8
             image_sync& operator=(image_sync&&) noexcept = delete;
         };
 
-        SDL_Window* window_{};
+        vulkan_window* window_{};
         vulkan_context* context_{};
         vulkan_device* device_{};
         VkFormat image_format_{};
