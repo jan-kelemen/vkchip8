@@ -1,5 +1,5 @@
-#ifndef VKCHIP8_VULKAN_PIPELINE_INCLUDED
-#define VKCHIP8_VULKAN_PIPELINE_INCLUDED
+#ifndef VKRNDR_VULKAN_PIPELINE_INCLUDED
+#define VKRNDR_VULKAN_PIPELINE_INCLUDED
 
 #include <vulkan/vulkan_core.h>
 
@@ -11,12 +11,12 @@
 #include <tuple>
 #include <vector>
 
-namespace vkchip8
+namespace vkrndr
 {
     class vulkan_device;
-} // namespace vkchip8
+} // namespace vkrndr
 
-namespace vkchip8
+namespace vkrndr
 {
     class [[nodiscard]] vulkan_pipeline final
     {
@@ -105,17 +105,17 @@ namespace vkchip8
         VkSampleCountFlagBits rasterization_samples_{VK_SAMPLE_COUNT_1_BIT};
         std::optional<VkPushConstantRange> push_constants_;
     };
-} // namespace vkchip8
+} // namespace vkrndr
 
-inline constexpr VkPipeline vkchip8::vulkan_pipeline::pipeline() const noexcept
+inline constexpr VkPipeline vkrndr::vulkan_pipeline::pipeline() const noexcept
 {
     return pipeline_;
 }
 
 inline constexpr VkPipelineLayout
-vkchip8::vulkan_pipeline::pipeline_layout() const noexcept
+vkrndr::vulkan_pipeline::pipeline_layout() const noexcept
 {
     return pipeline_layout_;
 }
 
-#endif // !VKCHIP8_VULKAN_PIPELINE_INCLUDED
+#endif // !VKRNDR_VULKAN_PIPELINE_INCLUDED

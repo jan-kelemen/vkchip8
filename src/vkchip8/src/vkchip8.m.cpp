@@ -76,9 +76,9 @@ namespace
 // Main code
 int main([[maybe_unused]] int argc, char** argv)
 {
-    vkchip8::sdl_guard sdl_guard{SDL_INIT_VIDEO | SDL_INIT_AUDIO};
+    vkrndr::sdl_guard sdl_guard{SDL_INIT_VIDEO | SDL_INIT_AUDIO};
 
-    vkchip8::sdl_window window{"vkchip8",
+    vkrndr::sdl_window window{"vkchip8",
         static_cast<SDL_WindowFlags>(
             SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI),
         true,
@@ -92,14 +92,13 @@ int main([[maybe_unused]] int argc, char** argv)
         std::random_device{}(),
         [&speaker]() { speaker.beep(); }};
 
-    emulator.load(vkchip8::as_bytes(code));
+    emulator.load(vkrndr::as_bytes(code));
 
     {
-        auto context{
-            vkchip8::create_context(&window, enable_validation_layers)};
-        auto device{vkchip8::create_device(context)};
-        vkchip8::vulkan_swap_chain swap_chain{&window, &context, &device};
-        vkchip8::vulkan_renderer renderer{&window,
+        auto context{vkrndr::create_context(&window, enable_validation_layers)};
+        auto device{vkrndr::create_device(context)};
+        vkrndr::vulkan_swap_chain swap_chain{&window, &context, &device};
+        vkrndr::vulkan_renderer renderer{&window,
             &context,
             &device,
             &swap_chain};
@@ -148,7 +147,7 @@ int main([[maybe_unused]] int argc, char** argv)
                 }
             }
 
-            if (vkchip8::swap_chain_refresh.load())
+            if (vkrndr::swap_chain_refresh.load())
             {
                 while (SDL_GetWindowFlags(window.native_handle()) &
                     SDL_WINDOW_MINIMIZED)
@@ -159,7 +158,7 @@ int main([[maybe_unused]] int argc, char** argv)
                 vkDeviceWaitIdle(device.logical());
                 swap_chain.recreate();
                 renderer.recreate();
-                vkchip8::swap_chain_refresh.store(false);
+                vkrndr::swap_chain_refresh.store(false);
             }
 
             uint64_t const current_tick{SDL_GetPerformanceCounter()};
@@ -184,7 +183,7 @@ int main([[maybe_unused]] int argc, char** argv)
             speaker.tick();
 
             std::array render_targets{
-                static_cast<vkchip8::vulkan_render_target const*>(
+                static_cast<vkrndr::vulkan_render_target const*>(
                     &screen_renderer)};
 
             renderer.draw(render_targets);

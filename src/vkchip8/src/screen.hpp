@@ -13,14 +13,17 @@
 namespace vkchip8
 {
     class chip8;
+} // namespace vkchip8
 
+namespace vkrndr
+{
     class vulkan_device;
     class vulkan_pipeline;
-} // namespace vkchip8
+} // namespace vkrndr
 
 namespace vkchip8
 {
-    class [[nodiscard]] screen final : public vulkan_render_target
+    class [[nodiscard]] screen final : public vkrndr::vulkan_render_target
     {
     public: // Construction
         screen(chip8* device);
@@ -65,7 +68,7 @@ namespace vkchip8
         std::vector<glm::fvec2> vertices_;
         std::vector<uint16_t> indices_;
         VkDescriptorSetLayout descriptor_set_layout_{};
-        std::unique_ptr<vulkan_pipeline> pipeline_;
+        std::unique_ptr<vkrndr::vulkan_pipeline> pipeline_;
         VkBuffer vert_index_buffer_{};
         VkDeviceMemory vert_index_memory_{};
         std::vector<frame_data> frame_data_;

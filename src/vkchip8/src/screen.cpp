@@ -11,7 +11,7 @@
 namespace
 {
     [[nodiscard]] VkDescriptorSetLayout create_descriptor_set_layout(
-        vkchip8::vulkan_device* const device)
+        vkrndr::vulkan_device* const device)
     {
         VkDescriptorSetLayoutBinding vertex_uniform_binding{};
         vertex_uniform_binding.binding = 0;
@@ -31,7 +31,7 @@ namespace
 
         VkDescriptorSetLayoutCreateInfo layout_info{};
         layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layout_info.bindingCount = vkchip8::count_cast(bindings.size());
+        layout_info.bindingCount = vkrndr::count_cast(bindings.size());
         layout_info.pBindings = bindings.data();
 
         VkDescriptorSetLayout rv{};
@@ -47,7 +47,7 @@ namespace
     }
 
     [[nodiscard]] std::tuple<VkBuffer, VkDeviceMemory> create_buffer(
-        vkchip8::vulkan_device* const device,
+        vkrndr::vulkan_device* const device,
         VkDeviceSize const size,
         VkBufferCreateFlags const usage,
         VkMemoryPropertyFlags const memory_properties)
@@ -74,7 +74,7 @@ namespace
         alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         alloc_info.allocationSize = memory_requirements.size;
         alloc_info.memoryTypeIndex =
-            vkchip8::find_memory_type(device->physical(),
+            vkrndr::find_memory_type(device->physical(),
                 memory_requirements.memoryTypeBits,
                 memory_properties);
 
@@ -97,7 +97,7 @@ namespace
     }
 
     [[nodiscard]] VkDescriptorSet create_descriptor_set(
-        vkchip8::vulkan_device* const device,
+        vkrndr::vulkan_device* const device,
         VkDescriptorSetLayout const layout,
         VkDescriptorPool const descriptor_pool)
     {
@@ -118,7 +118,7 @@ namespace
         return descriptor_set;
     }
 
-    void bind_descriptor_set(vkchip8::vulkan_device* const device,
+    void bind_descriptor_set(vkrndr::vulkan_device* const device,
         VkDescriptorSet const& descriptor_set,
         VkBuffer const vertex_buffer,
         VkBuffer const fragment_buffer)
@@ -158,7 +158,7 @@ namespace
             fragment_descriptor_write};
 
         vkUpdateDescriptorSets(device->logical(),
-            vkchip8::count_cast(descriptor_writes.size()),
+            vkrndr::count_cast(descriptor_writes.size()),
             descriptor_writes.data(),
             0,
             nullptr);
@@ -208,8 +208,8 @@ void vkchip8::screen::attach_renderer_impl(VkFormat const image_format,
 {
     descriptor_set_layout_ = create_descriptor_set_layout(vulkan_device_);
 
-    pipeline_ = std::make_unique<vulkan_pipeline>(
-        vulkan_pipeline_builder{vulkan_device_, image_format}
+    pipeline_ = std::make_unique<vkrndr::vulkan_pipeline>(
+        vkrndr::vulkan_pipeline_builder{vulkan_device_, image_format}
             .add_shader(VK_SHADER_STAGE_VERTEX_BIT, "vert.spv", "main")
             .add_shader(VK_SHADER_STAGE_FRAGMENT_BIT, "frag.spv", "main")
             .with_rasterization_samples(vulkan_device_->max_msaa_samples())
@@ -396,7 +396,7 @@ void vkchip8::screen::render_impl(VkCommandBuffer command_buffer,
         nullptr);
 
     vkCmdDrawIndexed(command_buffer,
-        count_cast(indices_.size()),
+        vkrndr::count_cast(indices_.size()),
         on_pixels,
         0,
         0,

@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-uint32_t vkchip8::find_memory_type(VkPhysicalDevice const physical_device,
+uint32_t vkrndr::find_memory_type(VkPhysicalDevice const physical_device,
     uint32_t const type_filter,
     VkMemoryPropertyFlags const properties)
 {
@@ -21,7 +21,7 @@ uint32_t vkchip8::find_memory_type(VkPhysicalDevice const physical_device,
     throw std::runtime_error{"failed to find suitable memory type!"};
 }
 
-void vkchip8::create_image(VkPhysicalDevice physical_device,
+void vkrndr::create_image(VkPhysicalDevice physical_device,
     VkDevice device,
     VkExtent2D extent,
     uint32_t mip_levels,
@@ -60,7 +60,7 @@ void vkchip8::create_image(VkPhysicalDevice physical_device,
     VkMemoryAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     alloc_info.allocationSize = memory_requirements.size;
-    alloc_info.memoryTypeIndex = vkchip8::find_memory_type(physical_device,
+    alloc_info.memoryTypeIndex = vkrndr::find_memory_type(physical_device,
         memory_requirements.memoryTypeBits,
         properties);
     if (vkAllocateMemory(device, &alloc_info, nullptr, &image_memory) !=
@@ -79,7 +79,7 @@ void vkchip8::create_image(VkPhysicalDevice physical_device,
 }
 
 [[nodiscard]]
-VkImageView vkchip8::create_image_view(VkDevice device,
+VkImageView vkrndr::create_image_view(VkDevice device,
     VkImage image,
     VkFormat format,
     VkImageAspectFlags aspect_flags,

@@ -1,5 +1,5 @@
-#ifndef VKCHIP8_VULKAN_SWAP_CHAIN_INCLUDED
-#define VKCHIP8_VULKAN_SWAP_CHAIN_INCLUDED
+#ifndef VKRNDR_VULKAN_SWAP_CHAIN_INCLUDED
+#define VKRNDR_VULKAN_SWAP_CHAIN_INCLUDED
 
 #include <vulkan/vulkan_core.h>
 
@@ -8,14 +8,14 @@
 #include <cstdint>
 #include <vector>
 
-namespace vkchip8
+namespace vkrndr
 {
     class vulkan_context;
     class vulkan_device;
     class vulkan_window;
-} // namespace vkchip8
+} // namespace vkrndr
 
-namespace vkchip8
+namespace vkrndr
 {
     struct [[nodiscard]] swap_chain_support final
     {
@@ -93,7 +93,7 @@ namespace vkchip8
             VkFence in_flight{};
 
         public: // Construction
-            explicit image_sync(vkchip8::vulkan_device* device);
+            explicit image_sync(vkrndr::vulkan_device* device);
 
             image_sync(image_sync const&) = delete;
             image_sync(image_sync&& other) noexcept;
@@ -121,53 +121,53 @@ namespace vkchip8
         VkQueue present_queue_{};
     };
 
-} // namespace vkchip8
+} // namespace vkrndr
 
-inline constexpr VkExtent2D vkchip8::vulkan_swap_chain::extent() const noexcept
+inline constexpr VkExtent2D vkrndr::vulkan_swap_chain::extent() const noexcept
 {
     return extent_;
 }
 
 inline constexpr VkSwapchainKHR
-vkchip8::vulkan_swap_chain::swap_chain() const noexcept
+vkrndr::vulkan_swap_chain::swap_chain() const noexcept
 {
     return chain_;
 }
 
 inline constexpr VkQueue
-vkchip8::vulkan_swap_chain::graphics_queue() const noexcept
+vkrndr::vulkan_swap_chain::graphics_queue() const noexcept
 {
     return graphics_queue_;
 }
 
 inline constexpr VkFormat
-vkchip8::vulkan_swap_chain::image_format() const noexcept
+vkrndr::vulkan_swap_chain::image_format() const noexcept
 {
     return image_format_;
 }
 
 inline constexpr uint32_t
-vkchip8::vulkan_swap_chain::min_image_count() const noexcept
+vkrndr::vulkan_swap_chain::min_image_count() const noexcept
 {
     return min_image_count_;
 }
 
 inline constexpr uint32_t
-vkchip8::vulkan_swap_chain::image_count() const noexcept
+vkrndr::vulkan_swap_chain::image_count() const noexcept
 {
-    return vkchip8::count_cast(images_.size());
+    return vkrndr::count_cast(images_.size());
 }
 
-inline constexpr VkImage vkchip8::vulkan_swap_chain::image(
+inline constexpr VkImage vkrndr::vulkan_swap_chain::image(
     uint32_t const image_index) const noexcept
 {
     return images_[image_index];
 }
 
-inline constexpr VkImageView vkchip8::vulkan_swap_chain::image_view(
+inline constexpr VkImageView vkrndr::vulkan_swap_chain::image_view(
     uint32_t const image_index) const noexcept
 {
     return image_views_[image_index];
 }
 
-#endif // !VKCHIP8_VULKAN_SWAP_CHAIN_INCLUDED
+#endif // !VKRNDR_VULKAN_SWAP_CHAIN_INCLUDED

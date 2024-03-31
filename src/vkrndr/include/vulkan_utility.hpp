@@ -1,5 +1,5 @@
-#ifndef VKCHIP8_VULKAN_UTILITY_INCLUDED
-#define VKCHIP8_VULKAN_UTILITY_INCLUDED
+#ifndef VKRNDR_VULKAN_UTILITY_INCLUDED
+#define VKRNDR_VULKAN_UTILITY_INCLUDED
 
 #include <vulkan/vulkan_core.h>
 
@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace vkchip8
+namespace vkrndr
 {
     [[nodiscard]] uint32_t find_memory_type(VkPhysicalDevice physical_device,
         uint32_t type_filter,
@@ -58,6 +58,6 @@ namespace vkchip8
         VkFormat format,
         VkImageAspectFlags aspect_flags,
         uint32_t mip_levels);
-} // namespace vkchip8
+} // namespace vkrndr
 
-#endif // !VKCHIP8_VULKAN_UTILITY_INCLUDED
+#endif // !VKRNDR_VULKAN_UTILITY_INCLUDED

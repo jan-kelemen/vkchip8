@@ -46,7 +46,7 @@ namespace
     }
 
     [[nodiscard]] VkSemaphore create_semaphore(
-        vkchip8::vulkan_device* const device)
+        vkrndr::vulkan_device* const device)
     {
         VkSemaphoreCreateInfo semaphore_info{};
         semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -63,7 +63,7 @@ namespace
         return rv;
     }
 
-    [[nodiscard]] VkFence create_fence(vkchip8::vulkan_device* const device,
+    [[nodiscard]] VkFence create_fence(vkrndr::vulkan_device* const device,
         bool set_signaled)
     {
         VkFenceCreateInfo fence_info{};
@@ -84,10 +84,10 @@ namespace
     }
 } // namespace
 
-vkchip8::swap_chain_support
-vkchip8::query_swap_chain_support(VkPhysicalDevice device, VkSurfaceKHR surface)
+vkrndr::swap_chain_support
+vkrndr::query_swap_chain_support(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
-    vkchip8::swap_chain_support rv;
+    vkrndr::swap_chain_support rv;
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device,
         surface,
@@ -124,7 +124,7 @@ vkchip8::query_swap_chain_support(VkPhysicalDevice device, VkSurfaceKHR surface)
     return rv;
 }
 
-vkchip8::vulkan_swap_chain::vulkan_swap_chain(vulkan_window* window,
+vkrndr::vulkan_swap_chain::vulkan_swap_chain(vulkan_window* window,
     vulkan_context* context,
     vulkan_device* device)
     : window_{window}
@@ -148,8 +148,7 @@ vkchip8::vulkan_swap_chain::vulkan_swap_chain(vulkan_window* window,
         &present_queue_);
 }
 
-vkchip8::vulkan_swap_chain::vulkan_swap_chain(
-    vulkan_swap_chain&& other) noexcept
+vkrndr::vulkan_swap_chain::vulkan_swap_chain(vulkan_swap_chain&& other) noexcept
     : window_{other.window_}
     , context_{other.context_}
     , device_{std::exchange(other.device_, nullptr)}
@@ -164,7 +163,7 @@ vkchip8::vulkan_swap_chain::vulkan_swap_chain(
 {
 }
 
-vkchip8::vulkan_swap_chain::~vulkan_swap_chain()
+vkrndr::vulkan_swap_chain::~vulkan_swap_chain()
 {
     if (device_)
     {
@@ -173,8 +172,7 @@ vkchip8::vulkan_swap_chain::~vulkan_swap_chain()
     }
 }
 
-bool vkchip8::vulkan_swap_chain::acquire_next_image(
-    uint32_t const current_frame,
+bool vkrndr::vulkan_swap_chain::acquire_next_image(uint32_t const current_frame,
     uint32_t& image_index)
 {
     constexpr auto timeout{std::numeric_limits<uint64_t>::max()};
@@ -207,7 +205,7 @@ bool vkchip8::vulkan_swap_chain::acquire_next_image(
     return true;
 }
 
-void vkchip8::vulkan_swap_chain::submit_command_buffer(
+void vkrndr::vulkan_swap_chain::submit_command_buffer(
     VkCommandBuffer const* const command_buffer,
     uint32_t const current_frame,
     uint32_t const image_index)
@@ -254,13 +252,13 @@ void vkchip8::vulkan_swap_chain::submit_command_buffer(
     }
 }
 
-void vkchip8::vulkan_swap_chain::recreate()
+void vkrndr::vulkan_swap_chain::recreate()
 {
     cleanup();
     create_chain_and_images();
 }
 
-vkchip8::vulkan_swap_chain& vkchip8::vulkan_swap_chain::operator=(
+vkrndr::vulkan_swap_chain& vkrndr::vulkan_swap_chain::operator=(
     vulkan_swap_chain&& other) noexcept
 {
     using std::swap;
@@ -283,7 +281,7 @@ vkchip8::vulkan_swap_chain& vkchip8::vulkan_swap_chain::operator=(
     return *this;
 }
 
-void vkchip8::vulkan_swap_chain::create_chain_and_images()
+void vkrndr::vulkan_swap_chain::create_chain_and_images()
 {
     auto swap_details{
         query_swap_chain_support(device_->physical(), context_->surface())};
@@ -370,7 +368,7 @@ void vkchip8::vulkan_swap_chain::create_chain_and_images()
     }
 }
 
-void vkchip8::vulkan_swap_chain::cleanup()
+void vkrndr::vulkan_swap_chain::cleanup()
 {
     for (size_t i{}; i != images_.size(); ++i)
     {
@@ -380,8 +378,8 @@ void vkchip8::vulkan_swap_chain::cleanup()
     vkDestroySwapchainKHR(device_->logical(), chain_, nullptr);
 }
 
-vkchip8::vulkan_swap_chain::image_sync::image_sync(
-    vkchip8::vulkan_device* const device)
+vkrndr::vulkan_swap_chain::image_sync::image_sync(
+    vkrndr::vulkan_device* const device)
     : device_{device}
     , image_available(create_semaphore(device))
     , render_finished(create_semaphore(device))
@@ -389,7 +387,7 @@ vkchip8::vulkan_swap_chain::image_sync::image_sync(
 {
 }
 
-vkchip8::vulkan_swap_chain::image_sync::image_sync(image_sync&& other) noexcept
+vkrndr::vulkan_swap_chain::image_sync::image_sync(image_sync&& other) noexcept
     : device_{std::exchange(other.device_, nullptr)}
     , image_available{std::exchange(other.image_available, nullptr)}
     , render_finished{std::exchange(other.render_finished, nullptr)}
@@ -397,7 +395,7 @@ vkchip8::vulkan_swap_chain::image_sync::image_sync(image_sync&& other) noexcept
 {
 }
 
-vkchip8::vulkan_swap_chain::image_sync::~image_sync()
+vkrndr::vulkan_swap_chain::image_sync::~image_sync()
 {
     if (device_)
     {

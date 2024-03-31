@@ -1,16 +1,16 @@
-#ifndef VKCHIP8_VULKAN_RENDER_TARGET_INCLUDED
-#define VKCHIP8_VULKAN_RENDER_TARGET_INCLUDED
+#ifndef VKRNDR_VULKAN_RENDER_TARGET_INCLUDED
+#define VKRNDR_VULKAN_RENDER_TARGET_INCLUDED
 
 #include <vulkan/vulkan_core.h>
 
 #include <cstdint>
 
-namespace vkchip8
+namespace vkrndr
 {
     class vulkan_device;
-} // namespace vkchip8
+} // namespace vkrndr
 
-namespace vkchip8
+namespace vkrndr
 {
     class [[nodiscard]] vulkan_render_target
     {
@@ -56,6 +56,6 @@ namespace vkchip8
         vulkan_device* vulkan_device_{};
         VkDescriptorPool descriptor_pool_{};
     };
-} // namespace vkchip8
+} // namespace vkrndr
 
-#endif // !VKCHIP8_VULKAN_RENDER_TARGET_INCLUDED
+#endif // !VKRNDR_VULKAN_RENDER_TARGET_INCLUDED

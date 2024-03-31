@@ -1,5 +1,5 @@
-#ifndef VKCHIP8_SDL_WINDOW_INCLUDED
-#define VKCHIP8_SDL_WINDOW_INCLUDED
+#ifndef VKRNDR_SDL_WINDOW_INCLUDED
+#define VKRNDR_SDL_WINDOW_INCLUDED
 
 #include <vulkan_window.hpp>
 
@@ -8,7 +8,7 @@
 
 #include <string_view>
 
-namespace vkchip8
+namespace vkrndr
 {
     class [[nodiscard]] sdl_guard final
     {
@@ -68,12 +68,12 @@ namespace vkchip8
     private: // Data
         SDL_Window* window_;
     };
-} // namespace vkchip8
+} // namespace vkrndr
 
 [[nodiscard]]
-inline constexpr SDL_Window* vkchip8::sdl_window::native_handle() const noexcept
+inline constexpr SDL_Window* vkrndr::sdl_window::native_handle() const noexcept
 {
     return window_;
 }
 
-#endif // !VKCHIP8_SDL_WINDOW_INCLUDED
+#endif // !VKRNDR_SDL_WINDOW_INCLUDED

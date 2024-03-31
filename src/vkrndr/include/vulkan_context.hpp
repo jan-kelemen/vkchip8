@@ -1,16 +1,16 @@
-#ifndef VKCHIP8_VULKAN_CONTEXT_INCLUDED
-#define VKCHIP8_VULKAN_CONTEXT_INCLUDED
+#ifndef VKRNDR_VULKAN_CONTEXT_INCLUDED
+#define VKRNDR_VULKAN_CONTEXT_INCLUDED
 
 #include <vulkan/vulkan_core.h>
 
 #include <optional>
 
-namespace vkchip8
+namespace vkrndr
 {
     class vulkan_window;
-} // namespace vkchip8
+} // namespace vkrndr
 
-namespace vkchip8
+namespace vkrndr
 {
     class [[nodiscard]] vulkan_context final
     {
@@ -44,16 +44,16 @@ namespace vkchip8
 
     vulkan_context create_context(vulkan_window* window,
         bool setup_validation_layers);
-} // namespace vkchip8
+} // namespace vkrndr
 
-inline constexpr VkInstance vkchip8::vulkan_context::instance() const noexcept
+inline constexpr VkInstance vkrndr::vulkan_context::instance() const noexcept
 {
     return instance_;
 }
 
-inline constexpr VkSurfaceKHR vkchip8::vulkan_context::surface() const noexcept
+inline constexpr VkSurfaceKHR vkrndr::vulkan_context::surface() const noexcept
 {
     return surface_;
 }
 
-#endif // !VKCHIP8_VULKAN_CONTEXT_INCLUDED
+#endif // !VKRNDR_VULKAN_CONTEXT_INCLUDED

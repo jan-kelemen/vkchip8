@@ -1,16 +1,16 @@
-#ifndef VKCHIP8_VULKAN_DEVICE_INCLUDED
-#define VKCHIP8_VULKAN_DEVICE_INCLUDED
+#ifndef VKRNDR_VULKAN_DEVICE_INCLUDED
+#define VKRNDR_VULKAN_DEVICE_INCLUDED
 
 #include <vulkan/vulkan_core.h>
 
 #include <cstdint>
 
-namespace vkchip8
+namespace vkrndr
 {
     class vulkan_context;
-} // namespace vkchip8
+} // namespace vkrndr
 
-namespace vkchip8
+namespace vkrndr
 {
     class [[nodiscard]] vulkan_device final
     {
@@ -53,35 +53,34 @@ namespace vkchip8
     };
 
     vulkan_device create_device(vulkan_context const& context);
-} // namespace vkchip8
+} // namespace vkrndr
 
 inline constexpr VkPhysicalDevice
-vkchip8::vulkan_device::physical() const noexcept
+vkrndr::vulkan_device::physical() const noexcept
 {
     return physical_device_;
 }
 
-inline constexpr VkDevice vkchip8::vulkan_device::logical() const noexcept
+inline constexpr VkDevice vkrndr::vulkan_device::logical() const noexcept
 {
     return logical_device_;
 }
 
 inline constexpr uint32_t
-vkchip8::vulkan_device::graphics_family() const noexcept
+vkrndr::vulkan_device::graphics_family() const noexcept
 {
     return graphics_family_;
 }
 
-inline constexpr uint32_t
-vkchip8::vulkan_device::present_family() const noexcept
+inline constexpr uint32_t vkrndr::vulkan_device::present_family() const noexcept
 {
     return present_family_;
 }
 
 inline constexpr VkSampleCountFlagBits
-vkchip8::vulkan_device::max_msaa_samples() const noexcept
+vkrndr::vulkan_device::max_msaa_samples() const noexcept
 {
     return max_msaa_samples_;
 }
 
-#endif // !VKCHIP8_VULKAN_DEVICE_INCLUDED
+#endif // !VKRNDR_VULKAN_DEVICE_INCLUDED

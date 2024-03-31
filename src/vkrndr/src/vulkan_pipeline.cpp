@@ -58,7 +58,7 @@ namespace
     }
 } // namespace
 
-vkchip8::vulkan_pipeline::vulkan_pipeline(vulkan_device* device,
+vkrndr::vulkan_pipeline::vulkan_pipeline(vulkan_device* device,
     VkPipelineLayout pipeline_layout,
     VkPipeline pipeline)
     : device_{device}
@@ -67,14 +67,14 @@ vkchip8::vulkan_pipeline::vulkan_pipeline(vulkan_device* device,
 {
 }
 
-vkchip8::vulkan_pipeline::vulkan_pipeline(vulkan_pipeline&& other) noexcept
+vkrndr::vulkan_pipeline::vulkan_pipeline(vulkan_pipeline&& other) noexcept
     : device_{std::exchange(other.device_, nullptr)}
     , pipeline_layout_{std::exchange(other.pipeline_layout_, nullptr)}
     , pipeline_{std::exchange(other.pipeline_, nullptr)}
 {
 }
 
-vkchip8::vulkan_pipeline::~vulkan_pipeline()
+vkrndr::vulkan_pipeline::~vulkan_pipeline()
 {
     if (device_)
     {
@@ -83,7 +83,7 @@ vkchip8::vulkan_pipeline::~vulkan_pipeline()
     }
 }
 
-vkchip8::vulkan_pipeline& vkchip8::vulkan_pipeline::operator=(
+vkrndr::vulkan_pipeline& vkrndr::vulkan_pipeline::operator=(
     vulkan_pipeline&& other) noexcept
 {
     using std::swap;
@@ -98,7 +98,7 @@ vkchip8::vulkan_pipeline& vkchip8::vulkan_pipeline::operator=(
     return *this;
 }
 
-vkchip8::vulkan_pipeline_builder::vulkan_pipeline_builder(
+vkrndr::vulkan_pipeline_builder::vulkan_pipeline_builder(
     vulkan_device* const device,
     VkFormat const image_format)
     : device_{device}
@@ -106,9 +106,9 @@ vkchip8::vulkan_pipeline_builder::vulkan_pipeline_builder(
 {
 }
 
-vkchip8::vulkan_pipeline_builder::~vulkan_pipeline_builder() { cleanup(); }
+vkrndr::vulkan_pipeline_builder::~vulkan_pipeline_builder() { cleanup(); }
 
-vkchip8::vulkan_pipeline vkchip8::vulkan_pipeline_builder::build()
+vkrndr::vulkan_pipeline vkrndr::vulkan_pipeline_builder::build()
 {
     std::vector<VkPipelineShaderStageCreateInfo> shader_stages;
     shader_stages.reserve(shaders_.size());
@@ -244,7 +244,7 @@ vkchip8::vulkan_pipeline vkchip8::vulkan_pipeline_builder::build()
     return {device_, pipeline_layout, pipeline};
 }
 
-vkchip8::vulkan_pipeline_builder& vkchip8::vulkan_pipeline_builder::add_shader(
+vkrndr::vulkan_pipeline_builder& vkrndr::vulkan_pipeline_builder::add_shader(
     VkShaderStageFlagBits const stage,
     std::filesystem::path const& path,
     std::string_view entry_point)
@@ -258,8 +258,8 @@ vkchip8::vulkan_pipeline_builder& vkchip8::vulkan_pipeline_builder::add_shader(
     return *this;
 }
 
-vkchip8::vulkan_pipeline_builder&
-vkchip8::vulkan_pipeline_builder::add_vertex_input(
+vkrndr::vulkan_pipeline_builder&
+vkrndr::vulkan_pipeline_builder::add_vertex_input(
     std::span<VkVertexInputBindingDescription const> binding_descriptions,
     std::span<VkVertexInputAttributeDescription const> attribute_descriptions)
 {
@@ -277,24 +277,24 @@ vkchip8::vulkan_pipeline_builder::add_vertex_input(
     return *this;
 }
 
-vkchip8::vulkan_pipeline_builder&
-vkchip8::vulkan_pipeline_builder::add_descriptor_set_layout(
+vkrndr::vulkan_pipeline_builder&
+vkrndr::vulkan_pipeline_builder::add_descriptor_set_layout(
     VkDescriptorSetLayout const descriptor_set_layout)
 {
     descriptor_set_layouts_.emplace_back(descriptor_set_layout);
     return *this;
 }
 
-vkchip8::vulkan_pipeline_builder&
-vkchip8::vulkan_pipeline_builder::with_rasterization_samples(
+vkrndr::vulkan_pipeline_builder&
+vkrndr::vulkan_pipeline_builder::with_rasterization_samples(
     VkSampleCountFlagBits const samples)
 {
     rasterization_samples_ = samples;
     return *this;
 }
 
-vkchip8::vulkan_pipeline_builder&
-vkchip8::vulkan_pipeline_builder::with_push_constants(
+vkrndr::vulkan_pipeline_builder&
+vkrndr::vulkan_pipeline_builder::with_push_constants(
     VkPushConstantRange const push_constants)
 {
     push_constants_ = push_constants;
@@ -302,7 +302,7 @@ vkchip8::vulkan_pipeline_builder::with_push_constants(
     return *this;
 }
 
-void vkchip8::vulkan_pipeline_builder::cleanup()
+void vkrndr::vulkan_pipeline_builder::cleanup()
 {
     descriptor_set_layouts_.clear();
     vertex_input_attributes_.clear();

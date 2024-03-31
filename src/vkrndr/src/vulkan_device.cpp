@@ -117,7 +117,7 @@ namespace
             return false;
         }
 
-        auto swap_chain{vkchip8::query_swap_chain_support(device, surface)};
+        auto swap_chain{vkrndr::query_swap_chain_support(device, surface)};
         bool const swap_chain_adequate = {!swap_chain.surface_formats.empty() &&
             !swap_chain.present_modes.empty()};
         if (!swap_chain_adequate)
@@ -164,7 +164,7 @@ namespace
     }
 } // namespace
 
-vkchip8::vulkan_device::vulkan_device(VkPhysicalDevice physical_device,
+vkrndr::vulkan_device::vulkan_device(VkPhysicalDevice physical_device,
     VkDevice logical_device,
     uint32_t graphics_family,
     uint32_t present_family)
@@ -176,7 +176,7 @@ vkchip8::vulkan_device::vulkan_device(VkPhysicalDevice physical_device,
 {
 }
 
-vkchip8::vulkan_device::vulkan_device(vulkan_device&& other) noexcept
+vkrndr::vulkan_device::vulkan_device(vulkan_device&& other) noexcept
     : physical_device_{other.physical_device_}
     , logical_device_{std::exchange(other.logical_device_, nullptr)}
     , graphics_family_{other.graphics_family_}
@@ -185,12 +185,12 @@ vkchip8::vulkan_device::vulkan_device(vulkan_device&& other) noexcept
 {
 }
 
-vkchip8::vulkan_device::~vulkan_device()
+vkrndr::vulkan_device::~vulkan_device()
 {
     vkDestroyDevice(logical_device_, nullptr);
 }
 
-vkchip8::vulkan_device& vkchip8::vulkan_device::operator=(
+vkrndr::vulkan_device& vkrndr::vulkan_device::operator=(
     vulkan_device&& other) noexcept
 {
     using std::swap;
@@ -207,7 +207,7 @@ vkchip8::vulkan_device& vkchip8::vulkan_device::operator=(
     return *this;
 }
 
-vkchip8::vulkan_device vkchip8::create_device(vulkan_context const& context)
+vkrndr::vulkan_device vkrndr::create_device(vulkan_context const& context)
 {
     uint32_t count{};
     vkEnumeratePhysicalDevices(context.instance(), &count, nullptr);

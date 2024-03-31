@@ -1,9 +1,8 @@
 #include <vulkan_renderer.hpp>
 
-#include <screen.hpp>
-
 #include <vulkan_context.hpp>
 #include <vulkan_device.hpp>
+#include <vulkan_render_target.hpp>
 #include <vulkan_swap_chain.hpp>
 #include <vulkan_utility.hpp>
 #include <vulkan_window.hpp>
@@ -20,7 +19,7 @@
 namespace
 {
     [[nodiscard]] VkCommandPool create_command_pool(
-        vkchip8::vulkan_device* const device)
+        vkrndr::vulkan_device* const device)
     {
         VkCommandPoolCreateInfo pool_info{};
         pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -37,7 +36,7 @@ namespace
         return rv;
     }
 
-    void create_command_buffers(vkchip8::vulkan_device* const device,
+    void create_command_buffers(vkrndr::vulkan_device* const device,
         VkCommandPool const command_pool,
         uint32_t const count,
         std::span<VkCommandBuffer> data_buffer)
@@ -58,11 +57,10 @@ namespace
         }
     }
 
-    VkDescriptorPool create_descriptor_pool(
-        vkchip8::vulkan_device* const device)
+    VkDescriptorPool create_descriptor_pool(vkrndr::vulkan_device* const device)
     {
-        constexpr auto count{vkchip8::count_cast(
-            vkchip8::vulkan_swap_chain::max_frames_in_flight)};
+        constexpr auto count{vkrndr::count_cast(
+            vkrndr::vulkan_swap_chain::max_frames_in_flight)};
 
         VkDescriptorPoolSize uniform_buffer_pool_size{};
         uniform_buffer_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -79,7 +77,7 @@ namespace
         VkDescriptorPoolCreateInfo pool_info{};
         pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool_info.poolSizeCount = vkchip8::count_cast(pool_sizes.size());
+        pool_info.poolSizeCount = vkrndr::count_cast(pool_sizes.size());
         pool_info.pPoolSizes = pool_sizes.data();
         pool_info.maxSets = 3 * count + 1;
 
@@ -123,7 +121,7 @@ namespace
     }
 } // namespace
 
-vkchip8::vulkan_renderer::vulkan_renderer(vulkan_window* window,
+vkrndr::vulkan_renderer::vulkan_renderer(vulkan_window* window,
     vulkan_context* context,
     vulkan_device* device,
     vulkan_swap_chain* swap_chain)
@@ -145,7 +143,7 @@ vkchip8::vulkan_renderer::vulkan_renderer(vulkan_window* window,
     init_imgui();
 }
 
-vkchip8::vulkan_renderer::~vulkan_renderer()
+vkrndr::vulkan_renderer::~vulkan_renderer()
 {
     ImGui_ImplVulkan_Shutdown();
     window_->shutdown_imgui();
@@ -158,7 +156,7 @@ vkchip8::vulkan_renderer::~vulkan_renderer()
     cleanup_images();
 }
 
-void vkchip8::vulkan_renderer::draw(
+void vkrndr::vulkan_renderer::draw(
     std::span<vulkan_render_target const*> targets)
 {
     uint32_t image_index{};
@@ -182,7 +180,7 @@ void vkchip8::vulkan_renderer::draw(
         (current_frame_ + 1) % vulkan_swap_chain::max_frames_in_flight;
 }
 
-void vkchip8::vulkan_renderer::init_imgui()
+void vkrndr::vulkan_renderer::init_imgui()
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -228,7 +226,7 @@ void vkchip8::vulkan_renderer::init_imgui()
     ImGui_ImplVulkan_Init(&init_info);
 }
 
-void vkchip8::vulkan_renderer::record_command_buffer(
+void vkrndr::vulkan_renderer::record_command_buffer(
     std::span<vulkan_render_target const*> targets,
     VkCommandBuffer& command_buffer,
     uint32_t const image_index)
@@ -297,12 +295,12 @@ void vkchip8::vulkan_renderer::record_command_buffer(
     }
 }
 
-bool vkchip8::vulkan_renderer::is_multisampled() const
+bool vkrndr::vulkan_renderer::is_multisampled() const
 {
     return device_->max_msaa_samples() != VK_SAMPLE_COUNT_1_BIT;
 }
 
-void vkchip8::vulkan_renderer::recreate()
+void vkrndr::vulkan_renderer::recreate()
 {
     if (is_multisampled())
     {
@@ -329,7 +327,7 @@ void vkchip8::vulkan_renderer::recreate()
     }
 }
 
-void vkchip8::vulkan_renderer::cleanup_images()
+void vkrndr::vulkan_renderer::cleanup_images()
 {
     vkDestroyImageView(device_->logical(), color_image_view_, nullptr);
     vkDestroyImage(device_->logical(), color_image_, nullptr);

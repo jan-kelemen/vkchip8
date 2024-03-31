@@ -1,6 +1,6 @@
 #include <vulkan_render_target.hpp>
 
-void vkchip8::vulkan_render_target::attach_renderer(
+void vkrndr::vulkan_render_target::attach_renderer(
     vulkan_device* const vulkan_device,
     VkDescriptorPool const descriptor_pool,
     VkFormat const image_format,
@@ -11,14 +11,14 @@ void vkchip8::vulkan_render_target::attach_renderer(
     attach_renderer_impl(image_format, frames_in_flight);
 }
 
-void vkchip8::vulkan_render_target::render(VkCommandBuffer command_buffer,
+void vkrndr::vulkan_render_target::render(VkCommandBuffer command_buffer,
     VkExtent2D extent,
     uint32_t frame_index) const
 {
     render_impl(command_buffer, extent, frame_index);
 }
 
-void vkchip8::vulkan_render_target::detach_renderer()
+void vkrndr::vulkan_render_target::detach_renderer()
 {
     detach_renderer_impl();
     vulkan_device_ = nullptr;

@@ -9,7 +9,7 @@
 #include <limits>
 #include <stdexcept>
 
-vkchip8::sdl_guard::sdl_guard(uint32_t const flags)
+vkrndr::sdl_guard::sdl_guard(uint32_t const flags)
 {
     if (SDL_Init(flags) != 0)
     {
@@ -18,9 +18,9 @@ vkchip8::sdl_guard::sdl_guard(uint32_t const flags)
     SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 }
 
-vkchip8::sdl_guard::~sdl_guard() { SDL_Quit(); }
+vkrndr::sdl_guard::~sdl_guard() { SDL_Quit(); }
 
-vkchip8::sdl_window::sdl_window(std::string_view const title,
+vkrndr::sdl_window::sdl_window(std::string_view const title,
     SDL_WindowFlags const window_flags,
     bool const centered,
     int const width,
@@ -38,9 +38,9 @@ vkchip8::sdl_window::sdl_window(std::string_view const title,
     }
 }
 
-vkchip8::sdl_window::~sdl_window() { SDL_DestroyWindow(window_); }
+vkrndr::sdl_window::~sdl_window() { SDL_DestroyWindow(window_); }
 
-std::vector<char const*> vkchip8::sdl_window::required_extensions() const
+std::vector<char const*> vkrndr::sdl_window::required_extensions() const
 {
     unsigned int extension_count{};
     SDL_Vulkan_GetInstanceExtensions(window_, &extension_count, nullptr);
@@ -52,13 +52,13 @@ std::vector<char const*> vkchip8::sdl_window::required_extensions() const
     return required_extensions;
 }
 
-bool vkchip8::sdl_window::create_surface(VkInstance instance,
+bool vkrndr::sdl_window::create_surface(VkInstance instance,
     VkSurfaceKHR& surface) const
 {
     return SDL_Vulkan_CreateSurface(window_, instance, &surface) == SDL_TRUE;
 }
 
-VkExtent2D vkchip8::sdl_window::swap_extent(
+VkExtent2D vkrndr::sdl_window::swap_extent(
     VkSurfaceCapabilitiesKHR const& capabilities) const
 {
     if (capabilities.currentExtent.width !=
@@ -84,9 +84,6 @@ VkExtent2D vkchip8::sdl_window::swap_extent(
     return actual_extent;
 }
 
-void vkchip8::sdl_window::init_imgui()
-{
-    ImGui_ImplSDL2_InitForVulkan(window_);
-}
+void vkrndr::sdl_window::init_imgui() { ImGui_ImplSDL2_InitForVulkan(window_); }
 
-void vkchip8::sdl_window::shutdown_imgui() { ImGui_ImplSDL2_Shutdown(); }
+void vkrndr::sdl_window::shutdown_imgui() { ImGui_ImplSDL2_Shutdown(); }

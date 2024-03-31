@@ -1,5 +1,5 @@
-#ifndef VKCHIP8_VULKAN_RENDERER_INCLUDED
-#define VKCHIP8_VULKAN_RENDERER_INCLUDED
+#ifndef VKRNDR_VULKAN_RENDERER_INCLUDED
+#define VKRNDR_VULKAN_RENDERER_INCLUDED
 
 #include <vulkan/vulkan_core.h>
 
@@ -8,16 +8,16 @@
 #include <span>
 #include <vector>
 
-namespace vkchip8
+namespace vkrndr
 {
     class vulkan_context;
     class vulkan_device;
     class vulkan_render_target;
     class vulkan_swap_chain;
     class vulkan_window;
-} // namespace vkchip8
+} // namespace vkrndr
 
-namespace vkchip8
+namespace vkrndr
 {
     class [[nodiscard]] vulkan_renderer final
     {
@@ -75,12 +75,12 @@ namespace vkchip8
 
         uint32_t current_frame_{};
     };
-} // namespace vkchip8
+} // namespace vkrndr
 
 inline constexpr VkDescriptorPool
-vkchip8::vulkan_renderer::descriptor_pool() noexcept
+vkrndr::vulkan_renderer::descriptor_pool() noexcept
 {
     return descriptor_pool_;
 }
 
-#endif // !VKCHIP8_VULKAN_RENDERER_INCLUDED
+#endif // !VKRNDR_VULKAN_RENDERER_INCLUDED

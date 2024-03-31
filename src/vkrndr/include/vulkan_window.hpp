@@ -1,11 +1,11 @@
-#ifndef VKCHIP8_VULKAN_WINDOW_INCLUDED
-#define VKCHIP8_VULKAN_WINDOW_INCLUDED
+#ifndef VKRNDR_VULKAN_WINDOW_INCLUDED
+#define VKRNDR_VULKAN_WINDOW_INCLUDED
 
 #include <vulkan/vulkan_core.h>
 
 #include <vector>
 
-namespace vkchip8
+namespace vkrndr
 {
     class [[nodiscard]] vulkan_window
     {
@@ -27,6 +27,6 @@ namespace vkchip8
         virtual void shutdown_imgui() = 0;
     };
 
-} // namespace vkchip8
+} // namespace vkrndr
 
-#endif // !VKCHIP8_VULKAN_WINDOW_INCLUDED
+#endif // !VKRNDR_VULKAN_WINDOW_INCLUDED

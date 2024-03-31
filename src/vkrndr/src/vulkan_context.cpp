@@ -127,7 +127,7 @@ namespace
     }
 } // namespace
 
-vkchip8::vulkan_context::vulkan_context(VkInstance instance,
+vkrndr::vulkan_context::vulkan_context(VkInstance instance,
     std::optional<VkDebugUtilsMessengerEXT> debug_messenger,
     VkSurfaceKHR surface)
     : instance_{instance}
@@ -136,14 +136,14 @@ vkchip8::vulkan_context::vulkan_context(VkInstance instance,
 {
 }
 
-vkchip8::vulkan_context::vulkan_context(vulkan_context&& other) noexcept
+vkrndr::vulkan_context::vulkan_context(vulkan_context&& other) noexcept
     : instance_{std::exchange(other.instance_, nullptr)}
     , debug_messenger_{std::exchange(other.debug_messenger_, {})}
     , surface_{std::exchange(other.surface_, nullptr)}
 {
 }
 
-vkchip8::vulkan_context::~vulkan_context()
+vkrndr::vulkan_context::~vulkan_context()
 {
     if (surface_)
     {
@@ -160,7 +160,7 @@ vkchip8::vulkan_context::~vulkan_context()
     vkDestroyInstance(instance_, nullptr);
 }
 
-vkchip8::vulkan_context& vkchip8::vulkan_context::operator=(
+vkrndr::vulkan_context& vkrndr::vulkan_context::operator=(
     vulkan_context&& other) noexcept
 {
     using std::swap;
@@ -175,13 +175,13 @@ vkchip8::vulkan_context& vkchip8::vulkan_context::operator=(
     return *this;
 }
 
-vkchip8::vulkan_context vkchip8::create_context(
-    vkchip8::vulkan_window* const window,
+vkrndr::vulkan_context vkrndr::create_context(
+    vkrndr::vulkan_window* const window,
     bool const setup_validation_layers)
 {
     VkApplicationInfo app_info{};
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    app_info.pApplicationName = "vkchip8";
+    app_info.pApplicationName = "vkrndr";
     app_info.applicationVersion = VK_MAKE_API_VERSION(0, 0, 1, 0);
     app_info.apiVersion = VK_API_VERSION_1_3;
 
