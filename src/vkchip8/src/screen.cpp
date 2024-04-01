@@ -7,6 +7,7 @@
 #include <chip8.hpp>
 
 #include <array>
+#include <cstring>
 
 namespace
 {

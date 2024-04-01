@@ -13,7 +13,7 @@ Necessary build tools are:
   * Visual Studio 2022 (MSVC v193)
 
 ```
-conan install . --profile=conan/clang-18 --build=missing --settings build_type=Release
+conan install . --profile=conan/clang-18 --profile=conan/dependencies --build=missing --settings build_type=Release
 cmake --preset release
 cmake --build --preset=release
 ```
