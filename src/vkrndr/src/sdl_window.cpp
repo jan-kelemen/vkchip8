@@ -1,6 +1,6 @@
 #include <sdl_window.hpp>
 
-#include <imgui_impl_sdl2.hpp>
+#include <imgui_impl_sdl2.h>
 
 #include <SDL.h>
 #include <SDL_vulkan.h>
@@ -30,7 +30,7 @@ vkrndr::sdl_window::sdl_window(std::string_view const title,
           centered ? SDL_WINDOWPOS_CENTERED : SDL_WINDOWPOS_UNDEFINED,
           width,
           height,
-          window_flags | SDL_WINDOW_VULKAN)}
+          static_cast<SDL_WindowFlags>(window_flags | SDL_WINDOW_VULKAN))}
 {
     if (window_ == nullptr)
     {

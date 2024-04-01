@@ -20,6 +20,8 @@ namespace
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME};
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
     constexpr VkPhysicalDeviceFeatures device_features{
         .sampleRateShading = VK_TRUE,
         .samplerAnisotropy = VK_TRUE};
@@ -28,6 +30,7 @@ namespace
         .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
         .synchronization2 = VK_TRUE,
         .dynamicRendering = VK_TRUE};
+#pragma GCC diagnostic pop
 
     struct [[nodiscard]] queue_family_indices final
     {

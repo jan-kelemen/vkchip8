@@ -179,14 +179,12 @@ void vkchip8::chip8::execute(uint16_t operation)
     else if (digit1 == 0x6)
     {
         // Store number NN in register VX
-        data_registers_[digit2] = digit3 << 4 | digit4;
+        data_registers_[digit2] = static_cast<uint8_t>(digit3 << 4 | digit4);
     }
     else if (digit1 == 0x7)
     {
         // Add the value NN to register VX
-        auto current{data_registers_[digit2]};
-        current += digit3 << 4 | digit4;
-        data_registers_[digit2] = current;
+        data_registers_[digit2] += static_cast<uint8_t>(digit3 << 4 | digit4);
     }
     else if (digit1 == 0x8 && digit4 == 0x0)
     {
@@ -310,7 +308,7 @@ void vkchip8::chip8::execute(uint16_t operation)
     else if (digit1 == 0xE && digit3 == 0x9 && digit4 == 0xE)
     {
         auto const vx{data_registers_[digit2]};
-        if (vx >= 0 && vx < keys_.size() && keys_.test(vx))
+        if (vx < keys_.size() && keys_.test(vx))
         {
             program_counter_ += 2;
         }
@@ -318,7 +316,7 @@ void vkchip8::chip8::execute(uint16_t operation)
     else if (digit1 == 0xE && digit3 == 0xA && digit4 == 0x1)
     {
         auto const vx{data_registers_[digit2]};
-        if (vx >= 0 && vx < keys_.size() && !keys_.test(vx))
+        if (vx < keys_.size() && !keys_.test(vx))
         {
             program_counter_ += 2;
         }

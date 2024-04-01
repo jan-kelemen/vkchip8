@@ -66,8 +66,7 @@ namespace vkrndr
         [[nodiscard]] bool acquire_next_image(uint32_t current_frame,
             uint32_t& image_index);
 
-        [[nodiscard]] void submit_command_buffer(
-            VkCommandBuffer const* command_buffer,
+        void submit_command_buffer(VkCommandBuffer const* command_buffer,
             uint32_t current_frame,
             uint32_t image_index);
 

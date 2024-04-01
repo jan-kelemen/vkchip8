@@ -8,7 +8,7 @@
 #include <vulkan_window.hpp>
 
 #include <imgui.h>
-#include <imgui_impl_vulkan.hpp>
+#include <imgui_impl_vulkan.h>
 
 #include <algorithm>
 #include <array>

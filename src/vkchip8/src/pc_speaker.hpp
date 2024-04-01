@@ -19,7 +19,7 @@ namespace vkchip8
         void beep();
 
     private: // Data
-        int device_id_{};
+        uint32_t device_id_{};
         bool beep_on_{};
         std::chrono::steady_clock::time_point beep_until_;
     };

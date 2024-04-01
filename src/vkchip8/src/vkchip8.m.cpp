@@ -9,10 +9,10 @@
 #include <chip8.hpp>
 #include <pc_speaker.hpp>
 
-#include "imgui.h"
-#include "imgui_impl_sdl2.hpp"
-#include "imgui_impl_vulkan.hpp"
 #include <SDL.h>
+#include <imgui.h>
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_vulkan.h>
 
 #include <vulkan/vulkan.h>
 
