@@ -14,7 +14,7 @@ class VKCHIP8Conan(ConanFile):
         self.requires("glm/cci.20230113")
         self.requires("fmt/10.2.1")
         self.requires("imgui/1.90.4-docking")
-        self.requires("sdl/2.28.5")
+        self.requires("sdl/2.30.1")
         self.requires("spdlog/1.13.0")
         self.requires("vulkan-headers/1.3.268.0")
         self.requires("vulkan-loader/1.3.268.0")

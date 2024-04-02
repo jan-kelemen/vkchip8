@@ -18,6 +18,15 @@ cmake --preset release
 cmake --build --preset=release
 ```
 
+Note: When building with Clang pulseaudio package fails use updated recipe from https://github.com/jan-kelemen/conan-recipes
+```
+git clone git@github.com:jan-kelemen/conan-recipes.git
+cd conan-recipes/recipes/sdl/all
+conan create . --version 2.30.1
+```
+
+And then execute the build commands again.
+
 ## References
 * [matmikolay/chip-8](https://github.com/mattmikolay/chip-8)
 * [aquova/chip8-book](https://github.com/aquova/chip8-book)
