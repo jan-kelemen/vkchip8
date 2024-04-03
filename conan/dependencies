@@ -1,2 +1,4 @@
 [options]
 sdl*:libunwind=False
+sdl*:wayland=False
+pulseaudio*:with_openssl=False
