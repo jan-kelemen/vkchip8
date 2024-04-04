@@ -64,7 +64,7 @@ jobs:
       - name: Fetch dependencies
         run: |
           conan profile detect --force
-          conan install . --profile=conan/${{ env.CONAN_PROFILE }} --profile conan/opt/linux-hardening --build=* --settings build_type=Release
+          conan install . --profile=conan/${{ env.CONAN_PROFILE }} --profile conan/opt/linux-hardening --profile conan/dependencies --build=* --settings build_type=Release
 
       - name: Configure CMake
         run: |
