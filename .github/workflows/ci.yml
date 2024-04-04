@@ -50,6 +50,10 @@ jobs:
         with:
           version: 2.2.1
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get install -y libegl-dev
+
       - name: Fetch dependencies
         run: |
           conan profile detect --force
