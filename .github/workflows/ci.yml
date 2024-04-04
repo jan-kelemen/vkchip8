@@ -133,6 +133,10 @@ jobs:
             $installer = Start-Process -FilePath VulkanSDK.exe -Wait -PassThru -ArgumentList @("--accept-licenses --default-answer --confirm-command install");
             $installer.WaitForExit();
 
+      - name: Set PATH variable
+        run: |
+          "C:\VulkanSDK\1.3.280.0\Bin" >> $env:GITHUB_PATH
+
       - name: Override public Conan recipes
         run: |
           conan profile detect --force
