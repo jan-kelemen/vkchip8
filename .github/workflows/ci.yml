@@ -72,7 +72,7 @@ jobs:
         run: |
           conan profile detect --force
           cd recipes/recipes/sdl/all
-          conan create . --version 2.30.1
+          conan create . --version 2.30.1 --build=missing
 
       - name: Fetch dependencies
         run: |
@@ -137,7 +137,7 @@ jobs:
         run: |
           conan profile detect --force
           cd recipes/recipes/sdl/all
-          conan create . --version 2.30.1
+          conan create . --version 2.30.1 --build=missing
 
       - name: Fetch dependencies
         run: |
