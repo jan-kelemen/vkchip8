@@ -28,12 +28,6 @@ jobs:
       - name: Checkout repository from github
         uses: actions/checkout@v4
 
-      - name: Checkout conan-recipes repository from github
-        uses: actions/checkout@v4
-        with:
-          repository: jan-kelemen/conan-recipes
-          path: recipes 
-
       - name: Install gcc-${{ env.GCC_VER }}
         if:  matrix.compiler == 'gcc'
         uses: ./.github/actions/install-gcc
@@ -46,23 +40,16 @@ jobs:
         with:
           version: ${{ env.CLANG_VER }}
 
-      - name: Install Conan
-        uses: turtlebrowser/get-conan@v1.2
-        with:
-          version: 2.2.1
-
       - name: Install APT packages
         uses: ./.github/actions/install-apt-packages
-      
-      - name: Override public Conan recipes
-        run: |
-          conan profile detect --force
-          cd recipes/recipes/sdl/all
-          conan create . --version 2.30.1 --build=missing
+
+      - name: Setup Conan
+        uses: ./.github/actions/setup-conan
+        with:
+          shell: bash
 
       - name: Fetch dependencies
         run: |
-          conan profile detect --force
           conan install . --profile=conan/${{ env.CONAN_PROFILE }} --profile conan/opt/linux-hardening --profile conan/dependencies --build=* --settings build_type=Release
 
       - name: Configure CMake
@@ -94,17 +81,6 @@ jobs:
       - name: Checkout repository from github
         uses: actions/checkout@v4
 
-      - name: Checkout conan-recipes repository from github
-        uses: actions/checkout@v4
-        with:
-          repository: jan-kelemen/conan-recipes
-          path: recipes 
-
-      - name: Install Conan
-        uses: turtlebrowser/get-conan@v1.2
-        with:
-          version: 2.2.1
-
       - name: Cache Vulkan SDK
         id: cache-vulkan-sdk
         uses: actions/cache@v4
@@ -123,15 +99,13 @@ jobs:
         run: |
           "C:\VulkanSDK\1.3.280.0\Bin" >> $env:GITHUB_PATH
 
-      - name: Override public Conan recipes
-        run: |
-          conan profile detect --force
-          cd recipes/recipes/sdl/all
-          conan create . --version 2.30.1 --build=missing
+      - name: Setup Conan
+        uses: ./.github/actions/setup-conan
+        with:
+          shell: pwsh
 
       - name: Fetch dependencies
         run: |
-          conan profile detect --force
           conan install . --profile=conan/${{ env.CONAN_PROFILE }} --profile=conan/opt/msvc-hardening --build=* --settings build_type=Release
 
       - name: Configure CMake
