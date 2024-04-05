@@ -38,5 +38,10 @@ runs:
     - name: Override public Conan recipes
       shell: ${{ inputs.shell }}
       run: |
-       cd recipes/recipes/sdl/all
-       conan create . --version 2.30.1 --build=missing
+       conan create recipes/recipes/sdl/all --version 2.30.1 --build=missing
+
+    - name: Override Linux specific public Conan recipes
+      if: ${{ inputs.compiler == 'clang' || inputs.compiler == 'gcc' }}
+      shell: ${{ inputs.shell }}
+      run: |
+       conan create recipes/recipes/pulseaudio/meson --version 17.0 --build=missing
