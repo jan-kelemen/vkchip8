@@ -42,7 +42,7 @@ jobs:
         with:
           compiler: clang
           compiler-version: ${{ env.CLANG_VER }}
-          shell: bash
+          build-type: Debug
 
       - name: Fetch dependencies
         run: |
@@ -90,7 +90,7 @@ jobs:
         with:
           compiler: clang
           compiler-version: ${{ env.CLANG_VER }}
-          shell: bash
+          build-type: Debug
 
       - name: Fetch dependencies
         run: |
@@ -129,7 +129,7 @@ jobs:
         with:
           compiler: gcc
           compiler-version: ${{ env.GCC_VER }}
-          shell: bash             
+          build-type: Debug             
 
       - name: Fetch dependencies
         run: |
@@ -171,7 +171,7 @@ jobs:
         with:
           compiler: gcc
           compiler-version: ${{ env.GCC_VER }}
-          shell: bash             
+          build-type: Debug             
 
       - name: Fetch dependencies
         run: |
@@ -211,7 +211,7 @@ jobs:
         with:
           compiler: msvc
           compiler-version: 2022
-          shell: pwsh
+          build-type: Debug
 
       - name: Fetch dependencies
         run: |

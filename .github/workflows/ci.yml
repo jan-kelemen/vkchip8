@@ -48,7 +48,7 @@ jobs:
         with:
           compiler: ${{ matrix.compiler }}
           compiler-version: ${{ matrix.compiler == 'gcc' && env.GCC_VER || env.CLANG_VER }}
-          shell: bash
+          build-type: Release
 
       - name: Fetch dependencies
         run: |
@@ -89,7 +89,7 @@ jobs:
         with:
           compiler: msvc
           compiler-version: 2022
-          shell: pwsh
+          build-type: Release
 
       - name: Fetch dependencies
         run: |
