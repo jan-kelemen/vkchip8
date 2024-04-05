@@ -29,7 +29,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install gcc-${{ env.GCC_VER }}
-        if:  matrix.compiler == 'gcc'
         uses: ./.github/actions/install-gcc
         with:
           version: ${{ env.GCC_VER }}

@@ -23,6 +23,9 @@ jobs:
       - name: Checkout repository from github
         uses: actions/checkout@v4
 
+      - name: Install gcc-${{ env.GCC_VER }}
+        uses: ./.github/actions/install-gcc
+
       - name: Install clang-${{ env.CLANG_VER }}
         uses: ./.github/actions/install-clang 
 
@@ -68,8 +71,6 @@ jobs:
 
       - name: Install gcc-${{ env.GCC_VER }}
         uses: ./.github/actions/install-gcc
-        with:
-          version: ${{ env.GCC_VER }}
 
       - name: Install APT packages
         uses: ./.github/actions/install-apt-packages

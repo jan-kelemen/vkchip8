@@ -2,7 +2,7 @@ name: 'Install GCC'
 inputs:
   version:
     description: 'Version to install'
-    required: true
+    required: false
     default: 13
 runs:
   using: 'composite'
