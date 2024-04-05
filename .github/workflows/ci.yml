@@ -36,10 +36,7 @@ jobs:
 
       - name: Install gcc-${{ env.GCC_VER }}
         if:  matrix.compiler == 'gcc'
-        run: |
-          sudo apt-get install -y gcc-${{ env.GCC_VER }} g++-${{ env.GCC_VER }}
-
-          echo "CONAN_PROFILE=gcc-${{ env.GCC_VER }}" >> $GITHUB_ENV
+        uses: ./.github/actions/install-gcc
 
       - name: Install clang-${{ env.CLANG_VER }}
         if: matrix.compiler == 'clang'
