@@ -81,23 +81,8 @@ jobs:
       - name: Checkout repository from github
         uses: actions/checkout@v4
 
-      - name: Cache Vulkan SDK
-        id: cache-vulkan-sdk
-        uses: actions/cache@v4
-        with:
-          path: "C:\\VulkanSDK\\1.3.280.0"
-          key: vulkan-sdk-1.3.280.0
-
-      - name: Setup Vulkan
-        if: steps.cache-vulkan-sdk.outputs.cache-hit != 'true'
-        run: |
-            Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.3.280.0/windows/VulkanSDK-1.3.280.0-Installer.exe" -OutFile VulkanSDK.exe
-            $installer = Start-Process -FilePath VulkanSDK.exe -Wait -PassThru -ArgumentList @("--accept-licenses --default-answer --confirm-command install");
-            $installer.WaitForExit();
-
-      - name: Set PATH variable
-        run: |
-          "C:\VulkanSDK\1.3.280.0\Bin" >> $env:GITHUB_PATH
+      - name: Install Vulkan SDK
+        uses: ./.github/actions/install-vulkan-sdk
 
       - name: Setup Conan
         uses: ./.github/actions/setup-conan
