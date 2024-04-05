@@ -52,7 +52,7 @@ jobs:
 
       - name: Fetch dependencies
         run: |
-          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile conan/dependencies --profile conan/opt/linux-hardening --build=* --settings build_type=Release
+          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile conan/dependencies --profile conan/opt/linux-hardening --build=missing --settings build_type=Release
 
       - name: Configure CMake
         run: |
@@ -93,7 +93,7 @@ jobs:
 
       - name: Fetch dependencies
         run: |
-          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/dependencies --profile=conan/opt/msvc-hardening --build=* --settings build_type=Release
+          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/dependencies --profile=conan/opt/msvc-hardening --build=missing --settings build_type=Release
 
       - name: Configure CMake
         run: |
