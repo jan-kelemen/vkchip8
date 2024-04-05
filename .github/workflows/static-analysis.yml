@@ -21,6 +21,9 @@ jobs:
       fail-fast: false
         
     steps:
+      - name: Checkout repository from github
+        uses: actions/checkout@v4
+
       - name: Install gcc-${{ env.GCC_VER }}
         uses: ./.github/actions/install-gcc
 
@@ -117,6 +120,9 @@ jobs:
       - name: Install gcc-${{ env.GCC_VER }}
         uses: ./.github/actions/install-gcc
 
+      - name: Install APT packages
+        uses: ./.github/actions/install-apt-packages
+
       - name: Setup Conan
         id: setup-conan
         uses: ./.github/actions/setup-conan
@@ -152,6 +158,9 @@ jobs:
 
       - name: Install gcc-${{ env.GCC_VER }}
         uses: ./.github/actions/install-gcc
+
+      - name: Install APT packages
+        uses: ./.github/actions/install-apt-packages
 
       - name: Install Cppcheck
         uses: ./.github/actions/install-cppcheck

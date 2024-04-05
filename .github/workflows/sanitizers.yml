@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-22.04
     
     env:
+      GCC_VER: 13
       CLANG_VER: 18
       
     strategy:
