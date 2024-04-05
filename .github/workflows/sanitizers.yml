@@ -5,6 +5,10 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   clang-asan-leak-undefined:
     runs-on: ubuntu-22.04
@@ -35,7 +39,7 @@ jobs:
 
       - name: Fetch dependencies
         run: |
-          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/opt/linux-address-sanitizer --profile=conan/opt/linux-leak-sanitizer --profile=conan/opt/linux-undefined-sanitizer --build=* --settings build_type=Release
+          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/dependencies --profile=conan/opt/linux-address-sanitizer --profile=conan/opt/linux-leak-sanitizer --profile=conan/opt/linux-undefined-sanitizer --build=* --settings build_type=Release
 
       - name: Configure CMake
         run: |
@@ -80,7 +84,7 @@ jobs:
 
       - name: Fetch dependencies
         run: |
-          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/opt/linux-thread-sanitizer --build=* --settings build_type=Release
+          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/dependencies --profile=conan/opt/linux-thread-sanitizer --build=* --settings build_type=Release
 
       - name: Configure CMake
         run: |
@@ -121,7 +125,7 @@ jobs:
 
       - name: Fetch dependencies
         run: |
-          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/opt/msvc-address-sanitizer --build=* --settings build_type=Release
+          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/dependencies --profile=conan/opt/msvc-address-sanitizer --build=* --settings build_type=Release
 
       - name: Configure CMake
         run: |
