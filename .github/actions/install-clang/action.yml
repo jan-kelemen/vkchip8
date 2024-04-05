@@ -1,0 +1,17 @@
+name: 'Install Clang'
+inputs:
+  version:
+    description: 'Version to install'
+    required: true
+    default: 18
+runs:
+  using: 'composite'
+  steps:
+    - name: Install
+      shell: bash
+      run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        . /etc/lsb-release
+        sudo add-apt-repository -y "deb http://apt.llvm.org/${DISTRIB_CODENAME}/ llvm-toolchain-${DISTRIB_CODENAME}-${{ env.CLANG_VER }} main"
+        sudo apt-get install -y clang-${{ env.CLANG_VER }} llvm-${{ env.CLANG_VER }}
+        echo "CONAN_PROFILE=clang-${{ env.CLANG_VER }}" >> $GITHUB_ENV
