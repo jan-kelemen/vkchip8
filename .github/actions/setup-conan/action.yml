@@ -24,6 +24,11 @@ runs:
       with:
         version: ${{ inputs.version }}
 
+    - name: Install Conan configuration files
+      shell: ${{ inputs.shell }}
+      run: |
+        conan config install conan/global.conf
+
     - name: Detect default profile
       shell: ${{ inputs.shell }}
       run: |
