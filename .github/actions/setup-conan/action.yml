@@ -1,12 +1,21 @@
 name: 'Setup Conan'
 inputs:
+  compiler:
+    description: 'Used compiler'
+    required: true
+  compiler-version:
+    description: 'Used compiler version'
+    required: true
+  shell:
+    description: 'Used shell for executing commands'
+    required: true
   version:
     description: 'Version to install'
     required: false
     default: 2.2.1
-  shell:
-    description: 'Used shell for executing commands'
-    required: true
+outputs:
+  conan-profile:
+    value: conan/${{ inputs.compiler }}-${{ inputs.compiler-version }}
 runs:
   using: 'composite'
   steps:

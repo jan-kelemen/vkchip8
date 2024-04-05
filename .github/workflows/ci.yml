@@ -44,13 +44,16 @@ jobs:
         uses: ./.github/actions/install-apt-packages
 
       - name: Setup Conan
+        id: setup-conan
         uses: ./.github/actions/setup-conan
         with:
+          compiler: ${{ matrix.compiler }}
+          compiler-version: ${{ matrix.compiler == 'gcc' && env.GCC_VER || env.CLANG_VER }}
           shell: bash
 
       - name: Fetch dependencies
         run: |
-          conan install . --profile=conan/${{ env.CONAN_PROFILE }} --profile conan/opt/linux-hardening --profile conan/dependencies --build=* --settings build_type=Release
+          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile conan/opt/linux-hardening --profile conan/dependencies --build=* --settings build_type=Release
 
       - name: Configure CMake
         run: |
@@ -67,9 +70,6 @@ jobs:
   windows:
     runs-on: windows-2022
 
-    env:
-      CONAN_PROFILE: msvc-2022
-
     strategy:
       fail-fast: false
 
@@ -85,13 +85,16 @@ jobs:
         uses: ./.github/actions/install-vulkan-sdk
 
       - name: Setup Conan
+        id: setup-conan
         uses: ./.github/actions/setup-conan
         with:
+          compiler: msvc
+          compiler-version: 2022
           shell: pwsh
 
       - name: Fetch dependencies
         run: |
-          conan install . --profile=conan/${{ env.CONAN_PROFILE }} --profile=conan/opt/msvc-hardening --build=* --settings build_type=Release
+          conan install . --profile=${{ steps.setup-conan.outputs.conan-profile }} --profile=conan/opt/msvc-hardening --build=* --settings build_type=Release
 
       - name: Configure CMake
         run: |
