@@ -1,4 +1,4 @@
-# vkchip8
+# vkchip8 [![GitHub Build status](https://github.com/jan-kelemen/vkchip8/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jan-kelemen/vkchip8/actions/workflows/ci.yml/badge.svg?branch=master)
 
 CHIP-8 emulator with Vulkan rendering engine.
 
@@ -18,14 +18,14 @@ cmake --preset release
 cmake --build --preset=release
 ```
 
-Note: When building with Clang pulseaudio package fails use updated recipe from https://github.com/jan-kelemen/conan-recipes
+Note: When building with Clang, Conan Center package of pulseaudio fails to build. Use updated recipe from https://github.com/jan-kelemen/conan-recipes of pulseaudio and SDL.
 ```
 git clone git@github.com:jan-kelemen/conan-recipes.git
-cd conan-recipes/recipes/sdl/all
-conan create . --version 2.30.1
+conan create conan-recipes/recipes/sdl/all --version 2.30.1
+conan create conan-recipes/recipes/pulseaudio/meson --version 17.0
 ```
 
-And then execute the build commands again.
+And then execute the build commands.
 
 ## References
 * [matmikolay/chip-8](https://github.com/mattmikolay/chip-8)
