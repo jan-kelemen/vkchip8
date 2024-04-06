@@ -1,5 +1,0 @@
-include(common-linux-hardening)
-
-[conf]
-tools.build:cflags+=["-mbranch-protection=standard"]
-tools.build:cxxflags+=["-mbranch-protection=standard"]

@@ -15,8 +15,8 @@ Checks: '
   performance-*,
   portability-*,
   readability-*,
-  -readability-magic-numbers
-  -readability-redundant-access-specifiers
+  -readability-magic-numbers,
+  -readability-redundant-access-specifiers,
   -readability-uppercase-literal-suffix
 '
 FormatStyle: 'file'
