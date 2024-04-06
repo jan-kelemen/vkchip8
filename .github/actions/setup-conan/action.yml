@@ -33,6 +33,19 @@ runs:
       run: |
         conan config install conan/global.conf
 
+    - name: Get Conan cache location
+      shell: ${{ inputs.shell }}
+      id: get-cache-location
+      run: |
+          echo "CONAN_CACHE_LOCATION=$(conan config home)" >> $GITHUB_ENV
+
+    - name: Cache Conan packages
+      id: cache-conan-packages
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.CONAN_CACHE_LOCATION }}/p
+        key: ${{ github.job }}-${{ hashFiles('conanfile.py') }}
+        
     - name: Detect default profile
       shell: ${{ inputs.shell }}
       run: |
