@@ -34,10 +34,16 @@ runs:
         conan config install conan/global.conf
 
     - name: Get Conan cache location
+      if: ${{ runner.os == 'Linux' }}
       shell: ${{ inputs.shell }}
-      id: get-cache-location
       run: |
           echo "CONAN_CACHE_LOCATION=$(conan config home)" >> $GITHUB_ENV
+
+    - name: Get Conan cache location
+      if: ${{ runner.os == 'Windows' }}
+      shell: ${{ inputs.shell }}
+      run: |
+        echo "CONAN_CACHE_LOCATION=$(conan config home)" >> $env:GITHUB_ENV
 
     - name: Cache Conan packages
       id: cache-conan-packages
