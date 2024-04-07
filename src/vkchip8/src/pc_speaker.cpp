@@ -5,7 +5,6 @@
 #include <cmath>
 #include <numbers>
 #include <stdexcept>
-#include <thread>
 
 namespace
 {
@@ -16,8 +15,8 @@ namespace
 
         auto time{0.f};
         auto* const snd{reinterpret_cast<short*>(stream)};
-        len /= sizeof(*snd);
-        for (int i = 0; i != len; i++)
+        size_t const length{static_cast<size_t>(len) / sizeof(*snd)};
+        for (size_t i{}; i != length; i++)
         {
             snd[i] = static_cast<short>(32000 * sin(time));
 

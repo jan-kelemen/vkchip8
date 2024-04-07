@@ -4,7 +4,6 @@
 #include <vulkan/vulkan_core.h>
 
 #include <cstdint>
-#include <memory>
 #include <span>
 #include <vector>
 
@@ -35,7 +34,8 @@ namespace vkrndr
         ~vulkan_renderer();
 
     public: // Interface
-        [[nodiscard]] constexpr VkDescriptorPool descriptor_pool() noexcept;
+        [[nodiscard]] constexpr VkDescriptorPool
+        descriptor_pool() const noexcept;
 
         void draw(std::span<vulkan_render_target const*> targets);
 
@@ -78,7 +78,7 @@ namespace vkrndr
 } // namespace vkrndr
 
 inline constexpr VkDescriptorPool
-vkrndr::vulkan_renderer::descriptor_pool() noexcept
+vkrndr::vulkan_renderer::descriptor_pool() const noexcept
 {
     return descriptor_pool_;
 }

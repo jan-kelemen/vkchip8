@@ -331,8 +331,6 @@ void vkchip8::screen::render_impl(VkCommandBuffer command_buffer,
         0,
         &data);
     glm::fvec2* instance_offsets{reinterpret_cast<glm::fvec2*>(data)};
-    auto orig =
-        std::span{instance_offsets, chip8::screen_width * chip8::screen_width};
 
     auto const& screen_data{device_->screen_data()};
     for (size_t i{}; i != screen_data.size(); ++i)
@@ -342,8 +340,8 @@ void vkchip8::screen::render_impl(VkCommandBuffer command_buffer,
             if (screen_data[i].test(j))
             {
                 std::construct_at(instance_offsets++,
-                    -1 + pixel_scale.x * j,
-                    -1 + pixel_scale.y * i);
+                    -1 + pixel_scale.x * static_cast<float>(j),
+                    -1 + pixel_scale.y * static_cast<float>(i));
 
                 ++on_pixels;
             }

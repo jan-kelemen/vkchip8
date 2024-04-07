@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <glm/glm.hpp>
+#include <glm/glm.hpp> // IWYU pragma: keep
 
 #include <memory>
 #include <vector>
@@ -17,7 +17,6 @@ namespace vkchip8
 
 namespace vkrndr
 {
-    class vulkan_device;
     class vulkan_pipeline;
 } // namespace vkrndr
 

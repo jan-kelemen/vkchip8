@@ -3,12 +3,17 @@
 #include <vulkan_utility.hpp>
 #include <vulkan_window.hpp>
 
+#include <vulkan/vk_platform.h>
+
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <stdexcept>
+#include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -176,7 +181,7 @@ vkrndr::vulkan_context& vkrndr::vulkan_context::operator=(
 }
 
 vkrndr::vulkan_context vkrndr::create_context(
-    vkrndr::vulkan_window* const window,
+    vkrndr::vulkan_window const* const window,
     bool const setup_validation_layers)
 {
     VkApplicationInfo app_info{};

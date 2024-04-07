@@ -9,7 +9,7 @@ target_sources(imgui_impl
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui_impl_vulkan.cpp
 )
 
-target_include_directories(imgui_impl
+target_include_directories(imgui_impl SYSTEM
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

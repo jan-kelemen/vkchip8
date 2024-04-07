@@ -2,9 +2,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iterator>
 #include <random>
 #include <ranges>
-#include <utility>
+#include <tuple>
 
 namespace
 {
@@ -111,7 +112,7 @@ void vkchip8::chip8::reset()
 
 uint16_t vkchip8::chip8::fetch()
 {
-    assert(program_counter_ + 1 < memory_.size());
+    assert(static_cast<uint16_t>(program_counter_ + 1) < memory_.size());
 
     auto const rv{static_cast<uint16_t>(memory_[program_counter_]) << 8 |
         (static_cast<uint16_t>(memory_[program_counter_ + 1]))};

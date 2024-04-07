@@ -3,17 +3,19 @@
 
 #include <vulkan_window.hpp>
 
-#include <SDL.h>
+#include <SDL_video.h>
 #include <vulkan/vulkan_core.h>
 
+#include <cstdint>
 #include <string_view>
+#include <vector>
 
 namespace vkrndr
 {
     class [[nodiscard]] sdl_guard final
     {
     public: // Construction
-        sdl_guard(uint32_t flags);
+        explicit sdl_guard(uint32_t flags);
 
         sdl_guard(sdl_guard const&) = delete;
 

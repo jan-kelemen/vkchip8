@@ -2,7 +2,7 @@
 
 #include <vulkan_context.hpp>
 #include <vulkan_device.hpp>
-#include <vulkan_render_target.hpp>
+#include <vulkan_render_target.hpp> // IWYU pragma: keep
 #include <vulkan_swap_chain.hpp>
 #include <vulkan_utility.hpp>
 #include <vulkan_window.hpp>
@@ -19,7 +19,7 @@
 namespace
 {
     [[nodiscard]] VkCommandPool create_command_pool(
-        vkrndr::vulkan_device* const device)
+        vkrndr::vulkan_device const* const device)
     {
         VkCommandPoolCreateInfo pool_info{};
         pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -57,7 +57,8 @@ namespace
         }
     }
 
-    VkDescriptorPool create_descriptor_pool(vkrndr::vulkan_device* const device)
+    VkDescriptorPool create_descriptor_pool(
+        vkrndr::vulkan_device const* const device)
     {
         constexpr auto count{vkrndr::count_cast(
             vkrndr::vulkan_swap_chain::max_frames_in_flight)};

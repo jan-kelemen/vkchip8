@@ -2,6 +2,7 @@
 #define VKCHIP8_PC_SPEAKER_INCLUDED
 
 #include <chrono>
+#include <cstdint>
 
 namespace vkchip8
 {

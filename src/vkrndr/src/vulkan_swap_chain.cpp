@@ -46,7 +46,7 @@ namespace
     }
 
     [[nodiscard]] VkSemaphore create_semaphore(
-        vkrndr::vulkan_device* const device)
+        vkrndr::vulkan_device const* const device)
     {
         VkSemaphoreCreateInfo semaphore_info{};
         semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -63,8 +63,8 @@ namespace
         return rv;
     }
 
-    [[nodiscard]] VkFence create_fence(vkrndr::vulkan_device* const device,
-        bool set_signaled)
+    [[nodiscard]] VkFence
+    create_fence(vkrndr::vulkan_device const* const device, bool set_signaled)
     {
         VkFenceCreateInfo fence_info{};
         fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -269,6 +269,7 @@ vkrndr::vulkan_swap_chain& vkrndr::vulkan_swap_chain::operator=(
         swap(context_, other.context_);
         swap(device_, other.device_);
         swap(image_format_, other.image_format_);
+        swap(min_image_count_, other.min_image_count_);
         swap(extent_, other.extent_);
         swap(chain_, other.chain_);
         swap(images_, other.images_);
@@ -295,17 +296,17 @@ void vkrndr::vulkan_swap_chain::create_chain_and_images()
     extent_ = window_->swap_extent(swap_details.capabilities);
     min_image_count_ = swap_details.capabilities.minImageCount;
 
-    uint32_t image_count{min_image_count_ + 1};
+    uint32_t used_image_count{min_image_count_ + 1};
     if (swap_details.capabilities.maxImageCount > 0)
     {
-        image_count =
-            std::min(swap_details.capabilities.maxImageCount, image_count);
+        used_image_count =
+            std::min(swap_details.capabilities.maxImageCount, used_image_count);
     }
 
     VkSwapchainCreateInfoKHR create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     create_info.surface = context_->surface();
-    create_info.minImageCount = image_count;
+    create_info.minImageCount = used_image_count;
     create_info.imageFormat = surface_format.format;
     create_info.imageColorSpace = surface_format.colorSpace;
     create_info.imageExtent = extent_;
@@ -342,23 +343,23 @@ void vkrndr::vulkan_swap_chain::create_chain_and_images()
 
     if (vkGetSwapchainImagesKHR(device_->logical(),
             chain_,
-            &image_count,
+            &used_image_count,
             nullptr) != VK_SUCCESS)
     {
         throw std::runtime_error{"failed to get swap chain images!"};
     }
 
-    images_.resize(image_count);
+    images_.resize(used_image_count);
     if (vkGetSwapchainImagesKHR(device_->logical(),
             chain_,
-            &image_count,
+            &used_image_count,
             images_.data()) != VK_SUCCESS)
     {
         throw std::runtime_error{"failed to get swap chain images!"};
     }
 
-    image_views_.resize(image_count);
-    for (size_t i{}; i != image_count; ++i)
+    image_views_.resize(used_image_count);
+    for (size_t i{}; i != used_image_count; ++i)
     {
         image_views_[i] = create_image_view(device_->logical(),
             images_[i],

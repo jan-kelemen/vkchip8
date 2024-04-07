@@ -1,5 +1,9 @@
 #include <vulkan_utility.hpp>
 
+#include <SDL_error.h>
+#include <SDL_hints.h>
+#include <SDL_stdinc.h>
+
 #include <stdexcept>
 
 uint32_t vkrndr::find_memory_type(VkPhysicalDevice const physical_device,

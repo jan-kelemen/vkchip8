@@ -42,7 +42,7 @@ namespace vkrndr
         VkSurfaceKHR surface_;
     };
 
-    vulkan_context create_context(vulkan_window* window,
+    vulkan_context create_context(vulkan_window const* window,
         bool setup_validation_layers);
 } // namespace vkrndr
 
