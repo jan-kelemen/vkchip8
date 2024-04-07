@@ -2,6 +2,14 @@
 
 CHIP-8 emulator with Vulkan rendering engine.
 
+## Try it out
+First argument to the emulator is ROM file which is loaded, simply run:
+```
+vkchip8.exe roms/pong.rom
+```
+
+Or you can try it with some other ROMs available online.
+
 ## Building
 Necessary build tools are:
 * CMake 3.27 or higher
